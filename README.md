@@ -11,16 +11,22 @@ We are using Python and Django for our blog server
 
 ## How to start working on the server code
 
-#### Install all required packages
+#### Create a virtualenv
 
 ```bash
-pip install -r requirements.txt
+virtualenv blogenv
 ```
 
 #### Activate our python virtual environment
 
 ```bash
 blogenv\Scripts\activate
+```
+
+#### Install all required packages
+
+```bash
+pip install -r requirements.txt
 ```
 
 #### After making changes to static files
