@@ -1,0 +1,29 @@
+#sec {
+  min-height: 15rem;
+}
+#formSubmit {
+  opacity: 0;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 0px;
+  width: 0px;
+}
+#emailPreview {
+  padding: 0.4rem 0.8rem;
+  margin: 1rem 0.2rem;
+  margin-bottom: 2rem;
+  color: #e7e7e7;
+  font-size: 1.2rem;
+  font-weight: 400;
+  cursor: pointer;
+  width: fit-content;
+}
+#emailPreview:hover {
+  color: var(--blue);
+}
+@media (min-width: 700px) {
+  #sec {
+    min-height: 20rem;
+  }
+}

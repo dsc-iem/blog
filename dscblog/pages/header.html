@@ -1,0 +1,17 @@
+<link rel="stylesheet" type="text/css" href="/static/styles/header.css" />
+{% if not blank %}
+<div id="header">
+    <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png"/></a>
+    {% if not header.is_empty %}
+    <div id="hd_opts" class="hstack space-around">
+        <a class="hd_opt" href="/joinRoom">Explore</a>
+        {% if header.is_loggedin %}
+        <a class="hd_opt" href="/account">Profile</a>
+        {% else %}
+        <a class="hd_opt" href="/login">Log In</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<div id="hd_space"></div>
+{% endif %}

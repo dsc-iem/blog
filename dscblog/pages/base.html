@@ -1,0 +1,33 @@
+{% load socialaccount %}
+<!doctype html>
+<html>
+
+<head>
+    <title>{% block title %}Blogs DSC-IEM{% endblock %}</title>
+    {% block head %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/xui/xui.css" />
+    <link rel="stylesheet" type="text/css" href="/static/styles/shared.css" />
+    <script src="/static/xui/xui.js"></script>
+    <script src="/static/scripts/jquery.js"></script>
+    <script src="/static/scripts/shared.js"></script>
+    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1.0, user-scalable=0">
+    <meta name="description" content={% block desc %}"Blogs from Developer Students Club IEM"{% endblock %} />
+    {% block tags %}{% endblock %}
+    {% endblock %}
+</head>
+
+<body>
+    {% block body %}
+    <div>
+        {% block root %}
+        {% include "header.html" with blank=no_header|default:False %}
+        {% block content %}
+        <h1>Something went wrong!</h1>
+        {% endblock %}
+        {% endblock %}
+    </div>
+    {% endblock %}
+</body>
+<script src={% block script %}{% endblock %}></script>
+</html>
