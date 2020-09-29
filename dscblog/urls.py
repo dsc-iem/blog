@@ -23,6 +23,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [
     path('', paths.index, name='index'),
+    path('login', RedirectView.as_view(url='/accounts/login', permanent=True)),
     path('accounts/', include('allauth.urls')),
     re_path(r'^favicon\.ico$', favicon_view),
     path('admin/', admin.site.urls),

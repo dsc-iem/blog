@@ -42,11 +42,10 @@ class User(AbstractUser):
         max_length=255,
         null=True, default=None
     )
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='Name')
     avatar_url = models.CharField(max_length=250, null=True, default=None)
     first_name = None
     last_name = None
-    last_seen = models.DateTimeField()
     REQUIRED_FIELDS = []
 
     objects = UserManager()

@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load account socialaccount %}
+
+{% if socialaccount_providers %}
+    <div style="width:100%;padding:0.5rem 0.5rem" class="center-col">
+        <a class="social-link" id="googleLink" href="{% provider_login_url 'google' %}">
+           <span id="g-icon"></span>&nbsp; Login with Google
+        </a>
+    </div>
+  <div class="social-or">{% trans 'OR' %}</div>
+
+{% include "socialaccount/snippets/login_extra.html" %}
+
+{% endif %}

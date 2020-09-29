@@ -1,0 +1,29 @@
+{% extends "account/form.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign In" %}{% endblock %}
+
+{% block form %}
+
+{% get_providers as socialaccount_providers %}
+
+<div style="padding:1rem 0rem" class="size-xs ink-grey base-semilight">
+  {% blocktrans %}Don't have an account? <a href="{{ signup_url }}" class="ink-blue">Sign Up ></a>{% endblocktrans %}
+</div>
+
+{% include "account/socialLinks.html" %}
+
+<form class="login" method="POST" action="{% url 'account_login' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <div style="padding:0.6rem 0.4rem">
+  <a class="ink-blue size-xs" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+  </div>
+  <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+</form>
+{% endblock %}

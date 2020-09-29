@@ -117,8 +117,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_FORMS = {
-    'login': 'allauth.account.forms.LoginForm',  # default
-    'signup': 'allauth.account.forms.SignupForm',  # default
+    'login': 'dscblog.forms.loginForm',
+    'signup': 'dscblog.forms.signupForm',
     'add_email': 'allauth.account.forms.AddEmailForm',  # default
     'change_password': 'allauth.account.forms.ChangePasswordForm',  # default
     'set_password': 'allauth.account.forms.SetPasswordForm',  # default
@@ -134,6 +134,8 @@ LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 
 ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
