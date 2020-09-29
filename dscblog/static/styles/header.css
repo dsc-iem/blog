@@ -1,14 +1,13 @@
 #header {
-  position: fixed;
-  top: 0px;
-  left: 0px;
   width: 100%;
-  height: 4rem;
+  height: 3rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: rgba(235, 235, 235, 0.329);
+}
+[data-theme="dark"] #header {
   background-color: rgba(0, 0, 0, 0.329);
-  z-index: 5;
 }
 #hd_hero {
   padding: 0.3rem 0.9rem;
@@ -21,27 +20,37 @@
   height: 3rem;
 }
 .hd_opt {
-  height: 4rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.3rem 1rem;
-  color: rgb(199, 199, 199);
+  padding: 0.3rem 1.2rem;
+  color: var(--secondary);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
 }
 .hd_opt:hover {
   color: inherit;
-  background-color: rgba(58, 58, 58, 0.26);
+  color: var(--blue);
 }
-.hd_opt.red_opt {
-  background-color: rgb(206, 0, 0);
-  color: white;
+#hd_themeToggle{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color:var(--primary);
+  cursor: pointer;
+  margin:0.2rem 1rem;
+  height: 1.5rem;
+  width: 1.5rem;
+  font-size: 1.1rem;
+  color:white;
+  border-radius: 100%;
+  background-color: rgb(180, 180, 180);
+  border:solid thin rgba(179, 179, 179, 0.301);
+  -webkit-user-select: none;
 }
-.hd_opt.red_opt:hover {
-  background-color: rgb(255, 0, 0);
-}
-#hd_space {
-  height: 4rem;
+[data-theme="dark"] #hd_themeToggle{
+  color:black;
+  background-color: rgb(88, 88, 88);
+  border:solid thin rgba(90, 90, 90, 0.301);
 }
