@@ -1,17 +1,46 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/header.css" />
 {% if not blank %}
 <div id="header">
-    <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png"/></a>
+    <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png" /></a>
     {% if not header.is_empty %}
     <div id="hd_opts" class="hstack space-around">
-        <a class="hd_opt" href="/joinRoom">Explore</a>
+        <a class="hd_opt" href="/explore">Explore</a>
         {% if header.is_loggedin %}
-        <a class="hd_opt" href="/account">Profile</a>
+        <a class="hd_opt" href="/create">Write</a>
+        <a class="hd_opt" href="/profile">Profile</a>
         {% else %}
-        <a class="hd_opt" href="/login">Log In</a>
+        <a class="hd_opt" href="/accounts/login">Log In</a>
         {% endif %}
+        <div id="hd_themeToggle">☀</div>
     </div>
     {% endif %}
 </div>
 <div id="hd_space"></div>
 {% endif %}
+<script>
+    function systemTheme() {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return 'dark'
+        } else {
+            return 'light'
+        }
+    }
+    if (document.documentElement.getAttribute("data-theme") == 'dark') {
+        $("#hd_themeToggle").html("🌜");
+    }
+    $("#hd_themeToggle").on('click', () => {
+        if (document.documentElement.getAttribute("data-theme") == 'dark') {
+            if (systemTheme() == 'light')
+                window.changeTheme('system');
+            else
+                window.changeTheme('light');
+            $("#hd_themeToggle").html("☀");
+        } else {
+            if (systemTheme() == 'dark')
+                window.changeTheme('system');
+            else
+                window.changeTheme('dark');
+            $("#hd_themeToggle").html("🌜");
+        }
+    })
+</script>
