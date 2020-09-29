@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% block root %}
+<link rel="stylesheet" type="text/css" href="/static/styles/forms.css" />
+<script src="/static/scripts/forms.js"></script>
+<div class="center-col">
+  <div id="formHeader" class="ink-grey size-xxl base-regular"><> Blogs</div>
+ <div id="formBox" class="container center-col">
+  {% block form %}
+Form
+{% endblock %}  
+</div> 
+<br/>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "account/form.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block form %}
+<div class="size-s ink-secondary base-regular" style="padding:0.6rem">
+  Sign up to post, like and comment
+</div>
+
+<div style="padding:1rem 0rem" class="size-xs ink-grey base-semilight">
+  {% blocktrans %}Have an account? <a href="{{ login_url }}" class="ink-blue">sign in ></a>{% endblocktrans %}
+</div>
+
+
+<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button class="button" type="submit">{% trans "Sign Up" %}</button>
+</form>
+{% endblock %}

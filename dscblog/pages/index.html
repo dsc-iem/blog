@@ -1,19 +1,10 @@
 {% extends "base.html" %}
-{% load socialaccount %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/styles/index.css" />
 <div class="container" id="s1">
     <div id="s1_title" class="ink-primary size-xxl base-m">
         Blogs <br />
         from DSC - IEM
-    </div>
-    <div>
-        {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }} !</p>
-        {% else %}
-        <div>Log In</div>
-        <a href="{% provider_login_url 'google' %}">Login with Google</a>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
