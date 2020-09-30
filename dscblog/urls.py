@@ -24,9 +24,17 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     path('', paths.index, name='index'),
     path('login', RedirectView.as_view(url='/accounts/login', permanent=True)),
+    path('<slug:slug>,<int:id>/', paths.blog, name='blog'),
+    path('create', paths.create, name='create'),
+    path('blog/<int:id>/settings', paths.blog_settings, name='blog_settings'),
     path('accounts/', include('allauth.urls')),
     re_path(r'^favicon\.ico$', favicon_view),
     path('admin/', admin.site.urls),
+    path('api/blog/title/set', paths.set_blog_title, name='set_blog_title'),
+    path('api/blog/image/set', paths.set_blog_img),
+    path('api/blog/publish', paths.publish_blog),
+    path('api/blog/unpublish', paths.unpublish_blog),
+    path('api/blog/delete', paths.delete_blog),
 ]
 
 handler404 = 'dscblog.paths.page404'

@@ -1,0 +1,21 @@
+{% extends "form.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "New blog" %}{% endblock %}
+
+{% block form %}
+
+<div class="size-s ink-secondary base-regular" style="padding:0.6rem">
+    Draft a new blog 📝
+  </div>
+
+<form class="newBlog" method="POST" action="">
+  {% csrf_token %}
+  {% if error %}
+  <div class="errorlist">{{ error }}</div>
+  {% endif %}
+  <input type="text" autocomplete="off" name="title" autofocus placeholder="Title" required />
+  <button class="primaryAction" type="submit">{% trans "Create" %}</button>
+</form>
+{% endblock %}

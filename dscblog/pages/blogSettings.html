@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Blog settings{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/styles/blogSettings.css" />
+<div class="container">
+    <br />
+    <div class="ink-primary size-xxl base-light">
+        Blog settings
+    </div>
+    <hr />
+    <div class="sec">
+        <div class="vstack align-left">
+            <div class="sec_title size-s ink-grey base-regular">Blog title</div>
+            <input id="titleBox" type="text" placeholder="Title" value="{{blog.title}}">
+        </div>
+        <div id="titleSave" class="button rounded saveButton">Save</div>
+    </div>
+    <div class="sec">
+        <div class="vstack align-left">
+            <div class="sec_title size-s ink-grey base-regular">Image URL</div>
+            <input id="imgBox" type="text" placeholder="URL" value="{{blog.img_url}}">
+        </div>
+        <div id="imgSave" class="button rounded saveButton">Save</div>
+    </div>
+    <div class="hstack space-around">
+        <div id="unpublish" class="button red rounded">Unpublish</div>
+        <div id="publish" class="button green rounded">Publish</div>
+        <div id="delete" class="button red rounded bordered">Delete</div>
+    </div>
+</div>
+<script>
+    var api = new window.Api();
+    const blog_id = {{blog.blog_id}}
+    var is_published = '{{blog.is_published}}'
+    var title = '{{blog.title}}'
+    var img_url = '{{blog.img_url}}'
+    if (is_published == 'True')
+        is_published = true;
+    else
+        is_published = false;
+
+    function renderPublishButton() {
+        if (!is_published) {
+            $("#publish").css({
+                display: 'block'
+            })
+            $("#unpublish").css({
+                display: 'none'
+            })
+        } else {
+            $("#publish").css({
+                display: 'none'
+            })
+            $("#unpublish").css({
+                display: 'block'
+            })
+        }
+    }
+    renderPublishButton()
+    $("#publish").on('click', () => {
+        api.post('blog/publish', {
+            blog_id
+        }, (code, res) => {
+            if (code == 201) {
+                is_published = true
+                renderPublishButton()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    })
+    $("#unpublish").on('click', () => {
+        api.post('blog/unpublish', {
+            blog_id
+        }, (code, res) => {
+            if (code == 201) {
+                is_published = false
+                renderPublishButton()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    })
+    $("#titleSave").on('click', () => {
+        api.post('blog/title/set', {
+            blog_id,
+            title: $("#titleBox").val().trim()
+        }, (code, res) => {
+            if (code == 201) {
+                title = res.title
+                $("#titleSave").css({
+                    display: 'none'
+                })
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    })
+    $("#imgSave").on('click', () => {
+        api.post('blog/image/set', {
+            blog_id,
+            img_url: $("#imgBox").val().trim()
+        }, (code, res) => {
+            if (code == 201) {
+                img_url = res.img_url
+                $("#imgSave").css({
+                    display: 'none'
+                })
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    })
+    $("#delete").on('click', () => {
+        api.post('blog/delete', {
+            blog_id
+        }, (code, res) => {
+            if (code == 201) {
+                window.location.href = "/"
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    })
+    $("#titleBox").on('input', () => {
+        var val = $("#titleBox").val().trim()
+        if (val.length > 3 && title != val) {
+            $("#titleSave").css({
+                display: 'block'
+            })
+        } else {
+            $("#titleSave").css({
+                display: 'none'
+            })
+        }
+    })
+    $("#imgBox").on('input', () => {
+        var val = $("#imgBox").val().trim()
+        if (val.length > 3 && img_url != val) {
+            $("#imgSave").css({
+                display: 'block'
+            })
+        } else {
+            $("#imgSave").css({
+                display: 'none'
+            })
+        }
+    })
+</script>
+{% endblock %}
