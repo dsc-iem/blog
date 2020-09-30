@@ -1,0 +1,17 @@
+.align-left{
+    align-items: flex-start;
+    text-align: left;
+}
+.sec_title{
+    padding: 0.4rem 0.6rem;
+}
+.sec{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 8rem;
+    justify-content: flex-start;
+}
+.saveButton{
+    display: none;
+}

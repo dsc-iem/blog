@@ -32,45 +32,10 @@ label #id_remember{
 p{
   margin: 0.1rem 0rem;
 }
-input {
-  padding: 0.3rem 0.7rem;
-  font-size: 1rem;
-  width: 17rem;
-  max-width: 85vw;
-  height: 2.6rem;
-  background-color: rgb(233, 233, 233);
-  color: rgb(75, 75, 75);
-  border: solid thin rgb(199, 199, 199);
-  margin: 0.3rem 0.3rem;
-  border-radius: 0.3rem;
-}
-[data-theme="dark"] input{
-  background-color: rgb(36, 36, 36);
-  color: rgb(211, 211, 211);
-  border: solid thin rgb(44 44 44);
-}
-input[type=checkbox]{
-  height: 1rem;
-  width: 1rem;
-  padding: auto;
-}
 label[for=id_remember]{
 display: inline-flex;
 font-size: 1rem;
 color:var(--grey)
-}
-button[type=submit]{
-  padding: 0.5rem;
-  width: 100%;
-  margin: 0.8rem 0rem;
-  background: rgb(0, 119, 255);
-  color:white;
-  font-size: 1rem;
-  font-weight: 400;
-  border-radius: 0.2rem;
-}
-button[type=submit]:hover{
-  background: rgb(0, 153, 255);
 }
 .social-link{
   display: flex;
@@ -99,15 +64,6 @@ button[type=submit]:hover{
 #googleLink{
   background: rgb(255, 255, 255);
   color:rgb(44, 44, 44);
-}
-.errorlist{
-  list-style: none;
-  padding: 0.3rem 0.2rem;
-  color:rgb(221, 0, 0);
-  font-size: 0.9rem;
-  width: 17rem;
-  max-width: 85vw;
-  text-align: left;
 }
 .social-or{
   padding: 0.8rem 0rem;
