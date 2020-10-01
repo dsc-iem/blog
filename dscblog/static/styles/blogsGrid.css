@@ -87,7 +87,7 @@
     padding: 0.3rem 0.5rem;
     border-radius: 0.8rem;
     cursor: pointer;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.5rem;
     margin-right: 0.6rem;
     margin-top: 0.2rem;
     -webkit-user-select: none;
@@ -97,4 +97,10 @@
 }
 [data-theme="dark"] .bi_optButt:hover{
     background-color: rgb(63, 63, 63);
+}
+.bi_locked{
+    height: 1.8rem;
+    width: 1.8rem;
+    object-fit: cover;
+    margin-left: 0.6rem;
 }

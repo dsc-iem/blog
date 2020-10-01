@@ -35,7 +35,7 @@ def profile(request, username):
     except:
         return page404(request)
     else:
-        opts['user'] = user.get_profile()
+        opts['user'] = user.get_profile(request.user)
         res = render(request, 'profile.html', opts)
         return res
 
