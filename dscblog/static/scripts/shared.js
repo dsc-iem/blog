@@ -53,3 +53,29 @@ const ua = window.navigator.userAgent;
 const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
 const webkit = !!ua.match(/WebKit/i);
 const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
+
+
+function toggleSwitch(id, onToggle = function () { }) {
+  var isActive = false;
+  var button = document.createElement('div');
+  button.className += 'toggle-button'
+  var circle = document.createElement('div')
+  circle.className += 'inner-circle'
+  button.appendChild(circle)
+  var root=document.getElementById(id)
+  root.appendChild(button)
+  root.className += 'toggle-container'
+  button.addEventListener('click', () => {
+    onToggle(isActive);
+  })
+  return (show = true) => {
+    if (show && !isActive) {
+      button.classList.toggle('active');
+      isActive = true
+    }
+    else if (!show && isActive) {
+      button.classList.toggle('active');
+      isActive = false
+    }
+  }
+}
