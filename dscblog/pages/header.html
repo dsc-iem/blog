@@ -2,8 +2,8 @@
 {% if not blank %}
 <div id="header">
     <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png" /></a>
-    {% if not header.is_empty %}
     <div id="hd_opts" class="hstack space-around">
+        {% if not header.is_empty %}
         <a class="hd_opt hd_canhide" href="/explore">Explore</a>
         {% if header.is_loggedin %}
         <a class="hd_opt" href="/create">Write</a>
@@ -11,12 +11,12 @@
         {% else %}
         <a class="hd_opt" href="/accounts/login">Log In</a>
         {% endif %}
+        {% endif %}
         <div id="hd_toggleBox">
             <div id="hd_themeToggle">☀</div>
         </div>
         
     </div>
-    {% endif %}
 </div>
 <div id="hd_space"></div>
 {% endif %}
