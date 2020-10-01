@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
 from dscblog.models import User, Blog
+import markdown
 
+md = markdown.Markdown(extensions=['extra'])
 
 def index(request):
     opts = {'header': {
@@ -51,6 +53,7 @@ def blog(request, slug, id):
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': False},
                     'blog': b.get_obj(),
+                    'html':md.convert(b.content),
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
@@ -92,6 +95,21 @@ def blog_settings(request, id):
             opts = {'header': {'is_loggedin': True, 'is_empty': False},
                     'blog': b.get_obj_min()}
             return render(request, 'blogSettings.html', opts)
+        else:
+            return page404(request)
+
+
+@login_required
+def blog_edit(request, id):
+    try:
+        b = Blog.get_by_id(id)
+    except:
+        return page404(request)
+    else:
+        if request.user == b.author:
+            opts = {'header': {'is_loggedin': True, 'is_empty': False},
+                    'blog': b.get_obj()}
+            return render(request, 'blogEditor.html', opts)
         else:
             return page404(request)
 

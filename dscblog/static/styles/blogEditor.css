@@ -1,0 +1,10 @@
+#content{
+    display: none;
+}
+html,body{
+    background-color: white;
+}
+
+.CodeMirror {
+	min-height: 80vh;
+}

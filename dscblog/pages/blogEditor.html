@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block root %}
+<link rel="stylesheet" type="text/css" href="/static/styles/blogEditor.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<div>
+    <textarea name="content" id="editor" class="markdown">
+    {% autoescape on %}
+    {{blog.content }}
+    {% endautoescape %}
+</textarea>
+</div>
+<br />
+<script>
+    document.documentElement.setAttribute("data-theme", "light");
+    var editor = new SimpleMDE({
+        element: document.getElementById('editor')
+    });
+    var api = new window.Api();
+    const blog_id = {{blog.blog_id}}
+    var lastSave=0;
+    var unsavedContent=false;
+    var saving=false;
+    function save(content) {
+        if((new Date().getTime()-lastSave)>2000){
+        if(!saving){
+        saving=true
+        api.post('blog/content/set', {
+            blog_id,
+            content
+        }, (code, res) => {
+            saving=false;
+            if (code == 201) {
+                console.log('saved');
+                lastSave=new Date().getTime()
+                unsavedContent=false
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    }
+    }
+    else{
+        console.log('too soon to save');
+        unsavedContent=true;
+    }
+    }
+    window.setInterval(function(){
+        if(unsavedContent){
+            saving=false;
+            save(editor.value().trim())
+        }
+    },5000)
+    editor.codemirror.on("change", function () {
+        var content = editor.value().trim();
+        save(content)
+    });
+</script>
+{% endblock %}
