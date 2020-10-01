@@ -8,6 +8,9 @@
         Blog settings
     </div>
     <hr />
+    <a href="/blog/{{blog.blog_id}}/edit" id="editSec" class="center size-s base-regular clickable container">
+        Edit blog
+    </a>
     <div class="sec">
         <div class="vstack align-left">
             <div class="sec_title size-s ink-grey base-regular">Blog title</div>
@@ -22,13 +25,29 @@
         </div>
         <div id="imgSave" class="button rounded saveButton">Save</div>
     </div>
-    <div class="hstack space-around">
-        <div id="unpublish" class="button red rounded">Unpublish</div>
-        <div id="publish" class="button green rounded">Publish</div>
-        <div id="delete" class="button red rounded bordered">Delete</div>
+    <div class="hstack space-between opt">
+        <div class="ink-grey size-s base-regular">Public</div>
+        <div id="toggle"></div>
     </div>
+    <br/>
+    <hr/>
+    <div class="center">
+        <div id="delete" class="ink-red clickable">Delete blog</div>
+    </div>
+    <br/>
 </div>
 <script>
+    var toggle=toggleSwitch("toggle",(isActive)=>{
+        var willActivate=!isActive
+        if(willActivate!=is_published){
+            if(willActivate){
+                publish()
+            }
+            else{
+                unpublish()
+            }
+        }
+    })
     var api = new window.Api();
     const blog_id = {{blog.blog_id}}
     var is_published = '{{blog.is_published}}'
@@ -40,24 +59,10 @@
         is_published = false;
 
     function renderPublishButton() {
-        if (!is_published) {
-            $("#publish").css({
-                display: 'block'
-            })
-            $("#unpublish").css({
-                display: 'none'
-            })
-        } else {
-            $("#publish").css({
-                display: 'none'
-            })
-            $("#unpublish").css({
-                display: 'block'
-            })
-        }
+        toggle(is_published)
     }
     renderPublishButton()
-    $("#publish").on('click', () => {
+    function publish () {
         api.post('blog/publish', {
             blog_id
         }, (code, res) => {
@@ -70,8 +75,8 @@
                 window.location.href = "/login"
             }
         })
-    })
-    $("#unpublish").on('click', () => {
+    }
+    function unpublish () {
         api.post('blog/unpublish', {
             blog_id
         }, (code, res) => {
@@ -84,7 +89,7 @@
                 window.location.href = "/login"
             }
         })
-    })
+    }
     $("#titleSave").on('click', () => {
         api.post('blog/title/set', {
             blog_id,
@@ -124,7 +129,7 @@
             blog_id
         }, (code, res) => {
             if (code == 201) {
-                window.location.href = "/"
+                window.location.href = "/profile"
             } else if (code == 400) {
                 alert(res.msg);
             } else if (code == 401) {

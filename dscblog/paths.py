@@ -11,8 +11,33 @@ def index(request):
         'is_loggedin': False, 'is_empty': False}}
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.top25()
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
     res = render(request, 'index.html', opts)
     return res
+
+
+@login_required
+def my_profile(request):
+    return redirect(to='/@'+request.user.username)
+
+
+def profile(request, username):
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False},
+        'is_owner': request.user.is_authenticated and request.user.username == username}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    try:
+        user = User.get_by_username(username)
+    except:
+        return page404(request)
+    else:
+        opts['user'] = user.get_profile()
+        res = render(request, 'profile.html', opts)
+        return res
 
 
 def blog(request, slug, id):
@@ -26,7 +51,7 @@ def blog(request, slug, id):
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': False},
                     'blog': b.get_obj(),
-                    'is_author': request.user.is_authenticated and request.user == b.author}
+                    'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                 res = render(request, 'blog.html', opts)
@@ -171,6 +196,26 @@ def delete_blog(request):
                 if b.author == request.user:
                     b.remove()
                     return apiRespond(201, removed=True)
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def set_blog_content(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST and 'content' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    b.update_content(request.POST['content'])
+                    return apiRespond(201)
                 else:
                     return apiRespond(400, msg='Access denied')
         else:

@@ -1,0 +1,100 @@
+.blogs_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  grid-column-gap: 0.5px;
+}
+
+.blog_item {
+  height: 15rem;
+  width: 30rem;
+  max-width: 90vw;
+  margin: 0.5rem;
+  margin-bottom: 1rem;
+  background-color:rgb(242, 242, 242);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 0.6rem;
+  display: flex;
+  justify-content: top;
+  align-items: left;
+  overflow: hidden;
+  position: relative;
+}
+[data-theme="dark"] .blog_item{
+    background-color:rgb(32, 32, 32);
+}
+.bi_title{
+    padding: 0.4rem 0rem;
+}
+.bi_title:hover{
+    color:rgb(0, 110, 255);
+}
+.bi_author:hover{
+    color:rgb(66, 165, 0);
+}
+.bi_txt{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.5rem 0.7rem;
+    padding-top: 0.6rem;
+}
+.bi_info{
+    display: flex;
+    flex-direction: column;
+}
+.bi_img{
+    background-color: var(--tertiary);
+    object-fit: cover;
+    height: 15rem;
+    width: 13rem;
+    border: none;
+}
+@media(max-width:1000px){
+    .blogs_grid {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
+@media(max-height:400px) and (max-width:700px){
+    .blog_item {
+        max-width: 20rem;
+    }
+}
+@media(max-width:700px){
+    .blog_item {
+        height: auto;
+        min-height: 26rem;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0px 2px 20px 5px #00000038;
+    }
+    .bi_img{
+        height: 17rem;
+        width: 100%;
+    }
+}
+.bi_opt{
+    display: block;
+    background-color: var(--tertiary);
+    height: 1.8rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 1.8rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    margin-bottom: 0.7rem;
+    margin-right: 0.6rem;
+    margin-top: 0.2rem;
+    -webkit-user-select: none;
+}
+.bi_optButt:hover{
+    background-color: rgb(192, 192, 192);
+}
+[data-theme="dark"] .bi_optButt:hover{
+    background-color: rgb(63, 63, 63);
+}
