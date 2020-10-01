@@ -6,7 +6,7 @@
 
 .blog_item {
   height: 15rem;
-  width: 30rem;
+  width: 28rem;
   max-width: 90vw;
   margin: 0.5rem;
   margin-bottom: 1rem;
@@ -16,22 +16,37 @@
   background-position: center;
   border-radius: 0.6rem;
   display: flex;
-  justify-content: top;
-  align-items: left;
+  align-items: flex-end;
+  padding-bottom: 1.1rem;
   overflow: hidden;
   position: relative;
 }
+.blog_item:hover{
+    opacity: 1;
+}
 [data-theme="dark"] .blog_item{
     background-color:rgb(32, 32, 32);
+}
+.bi_cover{
+    cursor: pointer;
+    position: absolute;
+    top:0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.219),rgba(0, 0, 0, 0.5));
+    z-index: 0;
+    transition: all 0.4s;
+}
+.bi_cover:hover{
+    background: rgba(0, 0, 0, 0.658);
 }
 .bi_title{
     padding: 0.4rem 0rem;
 }
 .bi_title:hover{
-    color:rgb(0, 110, 255);
-}
-.bi_author:hover{
-    color:rgb(66, 165, 0);
+    color: white;
+    opacity: 0.7;
 }
 .bi_txt{
     display: flex;
@@ -39,6 +54,9 @@
     justify-content: space-between;
     padding: 0.5rem 0.7rem;
     padding-top: 0.6rem;
+    position: relative;
+    z-index: 1;
+    -webkit-user-select: none;
 }
 .bi_info{
     display: flex;
@@ -67,8 +85,8 @@
 @media(max-width:700px){
     .blog_item {
         height: auto;
-        min-height: 26rem;
-        flex-direction: column;
+        min-height: 12rem;
+        padding-bottom: 0.5rem;
         position: relative;
         box-shadow: 0px 2px 20px 5px #00000038;
     }
@@ -76,6 +94,10 @@
         height: 17rem;
         width: 100%;
     }
+}
+.bi_opts{
+    margin-bottom: 0.5rem;
+    margin-top: 0.2rem;
 }
 .bi_opt{
     display: block;
@@ -87,9 +109,7 @@
     padding: 0.3rem 0.5rem;
     border-radius: 0.8rem;
     cursor: pointer;
-    margin-bottom: 0.5rem;
     margin-right: 0.6rem;
-    margin-top: 0.2rem;
     -webkit-user-select: none;
 }
 .bi_optButt:hover{
@@ -101,6 +121,12 @@
 .bi_locked{
     height: 1.8rem;
     width: 1.8rem;
-    object-fit: cover;
-    margin-left: 0.6rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0px 0.6rem;
+    background-image: url(/static/icons/locked-light.png);
+}
+[data-theme="dark"] .bi_locked{
+    background-image: url(/static/icons/locked-dark.png);
 }

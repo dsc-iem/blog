@@ -15,6 +15,7 @@
     font-weight: 300;
     line-height: 1.4;
     text-align: center;
+    overflow: hidden;
 }
 
 .markdown * {
@@ -75,6 +76,7 @@ h6 {
 p {
     margin-top: 0;
     margin-bottom: 1rem;
+    overflow-x: hidden;
 }
 
 .markdown a {
@@ -136,11 +138,16 @@ pre {
     padding: 1rem 2rem;
     background-color:var(--tertiary);
     border-left: 0.1rem solid #888;
+    overflow-x: auto;
 }
 
 p code {
     padding: 0 0.2em 0.1em;
     background-color: #eee;
+}
+
+[data-theme="dark"] p code {
+    background-color: rgb(53, 53, 53);
 }
 
 p var {
@@ -177,6 +184,11 @@ blockquote {
     font-size: 1.2rem;
     font-style: italic;
     line-height: 1.5;
+    overflow: hidden;
+}
+
+[data-theme="dark"] blockquote {
+    background-color: rgb(27, 27, 27);
 }
 
 blockquote::before {
@@ -214,7 +226,7 @@ abbr[title] {
 
 ul {
     list-style: none;
-    margin-left: -2em;
+    margin-left: -1.3em;
     padding-left: 2em;
 }
 
@@ -228,7 +240,7 @@ ul > li::before {
     position: relative;
     height: 0;
     width: 2em;
-    margin-left: -2.5em;
+    margin-left: -2.3em;
     font-weight: bolder;
     color: #888;
     text-align: right;
@@ -248,8 +260,6 @@ ul ul > li::before {
 
 ol {
     list-style: none;
-    margin-left: -2em;
-    padding-left: 2em;
 }
 
 ol > li {
@@ -344,6 +354,11 @@ tfoot tr {
 tbody tr:hover,
 tfoot tr:hover {
     background-color: #eee;
+}
+
+[data-theme="dark"] tbody tr:hover,
+tfoot tr:hover{
+    background-color: rgb(44, 44, 44);
 }
 
 td, th {

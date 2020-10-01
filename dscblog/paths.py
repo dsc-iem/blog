@@ -38,6 +38,7 @@ def profile(request, username):
         return page404(request)
     else:
         opts['user'] = user.get_profile(request.user)
+        print(opts['user'])
         res = render(request, 'profile.html', opts)
         return res
 
@@ -51,7 +52,7 @@ def blog(request, slug, id):
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
                 opts = {'header': {
-                    'is_loggedin': False, 'is_empty': False},
+                    'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(),
                     'html':md.convert(b.content),
                     'is_owner': request.user.is_authenticated and request.user == b.author}
