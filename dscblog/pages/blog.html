@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/styles/blog.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+<div class="container blog_opts">
+{% if is_owner %}
+<br/>
+<div class="hstack space-between">
+    {% if not blog.is_published %}
+    <div>
+        <img class="bi_locked" alt="locked" src="/static/icons/locked.png" />
+    </div>
+    {% endif %}
+    <div style="display:flex">
+        <a href="/blog/{{blog.blog_id}}/edit" class="bi_opt center">Edit</a>
+        <a href="/blog/{{blog.blog_id}}/settings" class="bi_opt center">Settings</a>
+    </div>
+</div>
+{% endif %}    
+</div>
+
+<div class="markdown">
+    <div class="size-s base-regular ink-grey">{{blog.modified_on}}</div>
+    <div class="size-xxl ink-primary base-light blog-title">{{blog.title}}</div>
+    <div class="size-s ink-grey base-semilight blog-author">
+        By <a href="/@{{blog.author.username}}">{{blog.author.username}}</a>
+    </div>
+    <hr />
+    {% autoescape off %}
+    {{html}}
+    {% endautoescape %}
+</div>
+<br />
+<br />
+{% endblock %}
