@@ -1,6 +1,6 @@
 .blogs_grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
   grid-column-gap: 0.5px;
 }
 
@@ -8,7 +8,7 @@
   height: 15rem;
   width: 28rem;
   max-width: 90vw;
-  margin: 0.5rem;
+  margin: 0.5rem auto;
   margin-bottom: 1rem;
   background-color:rgb(242, 242, 242);
   background-size: cover;
