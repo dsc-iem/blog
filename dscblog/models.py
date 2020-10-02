@@ -169,5 +169,10 @@ class Blog(models.Model):
     def top25(cls):
         return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:25]
 
+    @classmethod
+    def spotOne(cls):
+        # Only for dev, not optimal for production
+        return cls.objects.filter(is_published=True).order_by('?').first()
+
     def __str__(self):
         return self.title

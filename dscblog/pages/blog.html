@@ -28,11 +28,12 @@
 </div>
 
 <div class="markdown">
+        <div onclick="openLink('/@{{blog.author.username}}')" 
+        class="size-s ink-secondary base-semilight blog-author clickable">
+            {{blog.author.username}}
+        </div>
     <div class="size-s base-light ink-grey">{{blog.modified_on}}</div>
-    <div class="size-xxl ink-primary base-light blog-title">{{blog.title}}</div>
-    <div class="size-s ink-grey base-semilight blog-author">
-        By <a href="/@{{blog.author.username}}">{{blog.author.username}}</a>
-    </div>
+    <div class="size-xxl ink-primary base-regular blog-title">{{blog.title}}</div>
     <br/>
     {% autoescape off %}
     {{html}}
