@@ -79,3 +79,7 @@ function toggleSwitch(id, onToggle = function () { }) {
     }
   }
 }
+
+function openLink(link){
+  window.location.href=link
+}

@@ -6,7 +6,7 @@ from dscblog.common import to_json, apiRespond
 from dscblog.models import User, Blog
 import markdown
 
-md = markdown.Markdown(extensions=['extra'])
+md = markdown.Markdown(extensions=['extra',	'markdown.extensions.codehilite'])
 
 def index(request):
     opts = {'header': {
@@ -54,7 +54,7 @@ def blog(request, slug, id):
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(),
-                    'html':md.convert(b.content),
+                    'html':md.reset().convert(b.content),
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
@@ -233,7 +233,8 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    b.update_content(request.POST['content'])
+                    content=request.POST['content']
+                    b.update_content(content)
                     return apiRespond(201)
                 else:
                     return apiRespond(400, msg='Access denied')
