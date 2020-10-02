@@ -169,10 +169,20 @@ class Blog(models.Model):
     def top25(cls):
         return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:25]
 
+    def __str__(self):
+        return str(self.id)+'. '+self.title
+
+
+class Featured(models.Model):
+    info = models.CharField(
+        max_length=60, verbose_name='Info', blank=True, default=None)
+    blog = models.OneToOneField(
+        to=Blog, primary_key=True, on_delete=models.CASCADE)
+    priority = models.IntegerField(verbose_name="Priority", default=0)
+
     @classmethod
-    def spotOne(cls):
-        # Only for dev, not optimal for production
-        return cls.objects.filter(is_published=True).order_by('?').first()
+    def pickOne(cls):
+        return cls.objects.filter(blog__is_published=True).order_by('?').first()
 
     def __str__(self):
-        return self.title
+        return str(self.blog.id)+': '+self.blog.title

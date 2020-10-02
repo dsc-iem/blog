@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
-from dscblog.models import User, Blog
+from dscblog.models import User, Blog, Featured
 import markdown
 
 md = markdown.Markdown(extensions=['extra',	'markdown.extensions.codehilite'])
@@ -19,7 +19,7 @@ def index(request):
     for b in blogs:
         opts['blogs'].append(b.get_obj_min())
     try:
-        featured = Blog.spotOne()
+        featured = Featured.pickOne().blog
     except Exception as e:
         print(e)
         opts['featured_blog'] = None
