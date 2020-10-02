@@ -2,7 +2,14 @@
     padding: 0.5rem 0px;
 }
 .blog-author{
-    padding-left: 1rem;
+    width: fit-content;
+    display: block;
+    padding-left: 0rem;
+    text-decoration: none;
+    margin-bottom: 0.2rem;
+}
+.blog-author:hover{
+    color: var(--primary);
 }
 .blog_opts{
     max-width: 34em;

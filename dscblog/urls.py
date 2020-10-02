@@ -23,6 +23,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [
     path('', paths.index, name='index'),
+    path('popular', paths.top25, name='popular'),
     path('login', RedirectView.as_view(url='/accounts/login', permanent=True)),
     path('None', RedirectView.as_view(url='/static/media/none.png', permanent=True)),
     path('explore', RedirectView.as_view(url='/', permanent=True)),

@@ -4,6 +4,7 @@
 
 .markdown {
     font-size: 20px;
+    color:var(--grey);
 }
 
 .markdown { /* TEXT PARENT */
@@ -31,6 +32,7 @@ h6 {
     margin: 0;
     padding: 0;
     font-weight: normal;
+    color:var(--secondary);
 }
 
 h1 {
@@ -80,27 +82,22 @@ p {
 }
 
 .markdown a {
-    background-image: linear-gradient(#449, #449);
     background-size: 0.06em 0.06em;
     background-repeat: repeat-x;
     background-position-y: 93%;
     background-position-x: 0;
-    color: #449;
+    color: rgba(0, 132, 255, 0.747);
     text-decoration: none;
-    /* text-shadow: white 0.7px 0.7px 0.1px, white 0 1px 0.1px, white -.7px 0.7px 0.1px, white -.7px 0 0.1px, white -.7px -.7px 0.1px, white 0 -.7px 0.1px, white 0.7px -.7px 0.1px, white 0.7px 0 0.1px; */
     transition: 0.15s;
 }
 
 .markdown a:active {
-    background-color: #eee;
-    color: #555;
+    color:rgba(132, 0, 255, 0.747);
     text-decoration: none;
-    /* text-shadow: #eee 0.7px 0.7px 0.1px, #eee 0 1px 0.1px, #eee -.7px 0.7px 0.1px, #eee -.7px 0 0.1px, #eee -.7px -.7px 0.1px, #eee 0 -.7px 0.1px, #eee 0.7px -.7px 0.1px, #eee 0.7px 0 0.1px; */
 }
 
 .markdown a:hover {
-    background-image: linear-gradient(#66e, #66e);
-    color: #66e;
+    color:rgb(0, 195, 255);
 }
 
 b,
@@ -136,9 +133,13 @@ var {
 pre {
     display: block;
     padding: 1rem 2rem;
-    background-color:var(--tertiary);
-    border-left: 0.1rem solid #888;
+    background-color:#f6f8fa;
+    border-left: 2px solid rgb(211, 211, 211);
     overflow-x: auto;
+}
+[data-theme="dark"] pre{
+    border-color: rgb(54, 54, 54);
+    background-color:rgb(20, 20, 20);
 }
 
 p code {
@@ -177,28 +178,26 @@ kbd {
 }
 
 blockquote {
-    margin: 1rem -2rem;
+    margin: 1rem 1rem;
     padding: 1rem 2rem;
-    background-color: #eee;
-    color: #666;
+    color: rgb(119, 119, 119);
     font-size: 1.2rem;
     font-style: italic;
+    font-weight: 400;
     line-height: 1.5;
     overflow: hidden;
 }
-
 [data-theme="dark"] blockquote {
-    background-color: rgb(27, 27, 27);
+    color: rgb(163, 163, 163);
 }
-
 blockquote::before {
     content: "\201C";
     display: block;
     position: relative;
     height: 0;
     left: -1.3rem;
-    top: -0.5rem;
-    font-size: 2em;
+    top: -1.7rem;
+    font-size: 2.5em;
     color: #888;
 }
 
@@ -207,9 +206,9 @@ blockquote::after {
     display: inline-block;
     position: relative;
     height: 0;
-    top: 1.6rem;
-    left: 0.2rem;
-    font-size: 2em;
+    top: 0.4rem;
+    left: -1.3rem;
+    font-size: 2.5em;
     line-height: 0;
     color: #888;
 }

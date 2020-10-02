@@ -8,6 +8,7 @@ import markdown
 
 md = markdown.Markdown(extensions=['extra',	'markdown.extensions.codehilite'])
 
+
 def index(request):
     opts = {'header': {
         'is_loggedin': False, 'is_empty': False}}
@@ -17,7 +18,28 @@ def index(request):
     blogs = Blog.top25()
     for b in blogs:
         opts['blogs'].append(b.get_obj_min())
+    try:
+        featured = Blog.spotOne()
+    except Exception as e:
+        print(e)
+        opts['featured_blog'] = None
+    else:
+        opts['featured_blog'] = featured.get_obj_min()
+        opts['featured_blog']['intro'] = featured.content[:300]
     res = render(request, 'index.html', opts)
+    return res
+
+
+def top25(request):
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False}}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.top25()
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
+    res = render(request, 'top25.html', opts)
     return res
 
 
@@ -54,7 +76,7 @@ def blog(request, slug, id):
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(),
-                    'html':md.reset().convert(b.content),
+                    'html': md.reset().convert(b.content),
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
@@ -233,7 +255,7 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content=request.POST['content']
+                    content = request.POST['content']
                     b.update_content(content)
                     return apiRespond(201)
                 else:
