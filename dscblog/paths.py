@@ -5,8 +5,11 @@ from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
 from dscblog.models import User, Blog, Featured
 import markdown
+import html
+from pyembed.markdown import PyEmbedMarkdown
 
-md = markdown.Markdown(extensions=['extra',	'markdown.extensions.codehilite'])
+md = markdown.Markdown(
+    extensions=['extra','markdown.extensions.codehilite', PyEmbedMarkdown()])
 
 
 def index(request):
@@ -131,7 +134,7 @@ def blog_edit(request, id):
     else:
         if request.user == b.author:
             opts = {'header': {'is_loggedin': True, 'is_empty': False},
-                    'blog': b.get_obj()}
+                    'blog': b.get_obj(escape_html=False)}
             return render(request, 'blogEditor.html', opts)
         else:
             return page404(request)
@@ -255,7 +258,7 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content = request.POST['content']
+                    content = html.escape(request.POST['content'])
                     b.update_content(content)
                     return apiRespond(201)
                 else:
