@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from dscblog.common import makecode, dump_datetime
 from django.utils.text import slugify
+import html
 
 
 class UserManager(BaseUserManager):
@@ -111,9 +112,11 @@ class Blog(models.Model):
                'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
         return obj
 
-    def get_obj(self):
+    def get_obj(self,escape_html=True):
         obj = self.get_obj_min()
         obj['content'] = self.content
+        if not escape_html:
+            obj['content']=html.unescape(obj['content'])
         return obj
 
     def get_slug(self):

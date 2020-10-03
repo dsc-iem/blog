@@ -1,4 +1,5 @@
 asgiref==3.2.10
+beautifulsoup4==4.9.2
 certifi==2020.6.20
 chardet==3.0.4
 defusedxml==0.6.0
@@ -10,11 +11,14 @@ idna==2.10
 Markdown==3.2.2
 oauthlib==3.1.0
 psycopg2==2.8.6
+pyembed==1.3.3
+pyembed-markdown==1.1.0
 Pygments==2.7.1
 python3-openid==3.2.0
 pytz==2020.1
 requests==2.24.0
 requests-oauthlib==1.3.0
+soupsieve==2.0.1
 sqlparse==0.3.1
 urllib3==1.25.10
 whitenoise==5.2.0
