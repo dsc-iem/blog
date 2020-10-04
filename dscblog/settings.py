@@ -67,7 +67,7 @@ ROOT_URLCONF = 'dscblog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'dscblog', 'pages')],
+        'DIRS': [os.path.join(BASE_DIR, 'dscblog', 'pages/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
