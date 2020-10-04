@@ -45,6 +45,8 @@ urlpatterns = [
     path('api/blog/delete', paths.delete_blog),
     path('api/user/follow', paths.follow_user),
     path('api/user/unfollow', paths.unfollow_user),
+    path('api/blog/react', paths.blog_react),
+    path('api/blog/unreact', paths.blog_unreact),
 ]
 
 handler404 = 'dscblog.paths.page404'

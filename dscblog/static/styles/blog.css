@@ -41,3 +41,44 @@
     top:0px;
     z-index: 1;
 }
+#react_box{
+    padding: 1.2rem 0.8rem;
+    max-width: 100%;
+    overflow: auto;
+}
+.react{
+    margin: 0.4rem 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background-color: rgb(238, 238, 238);
+    border-radius: 0.3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.react.active{
+    background-color: rgb(187, 228, 255);
+}
+.react_count{
+    font-size: 0.85rem;
+    font-weight: 300;
+    color:var(--secondary);
+    padding-left: 0.2rem;
+}
+[data-theme='dark'] .react{
+    background-color: rgb(34, 34, 34);
+}
+[data-theme='dark'] .react.active{
+    background-color: rgb(11, 45, 61);
+}
+@media(max-width:700px){
+    .react{
+        margin: 0.4rem 0.2rem;
+    }
+    #react_box{
+        justify-content: space-around;
+    }
+}
