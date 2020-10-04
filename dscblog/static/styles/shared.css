@@ -19,6 +19,14 @@ body{
   border-radius: 0;
   margin: 0.3rem 0.3rem;
 }
+.helptext{
+  width: 17rem;
+  max-width: 85vw;
+  font-size: 0.9rem;
+  color:var(--grey);
+  font-weight: 200;
+  padding: 0.1rem 0.3rem;
+}
 .trunc {
   width: 16rem;
   max-width: 40vw;
@@ -80,6 +88,31 @@ form{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+textarea {
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 300;
+  overflow: auto;
+  resize: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 0.3rem 0.7rem;
+  font-size: 1rem;
+  width: 17rem;
+  height: 5rem;
+  max-width: 85vw;
+  background-color: rgb(233, 233, 233);
+  color: rgb(75, 75, 75);
+  border: solid thin rgb(199, 199, 199);
+  margin: 0.3rem 0.3rem;
+  border-radius: 0.3rem;
+  outline: none;
+}
+[data-theme="dark"] textarea{
+  background-color: rgb(36, 36, 36);
+  color: rgb(211, 211, 211);
+  border: solid thin rgb(44 44 44);
 }
 .errorlist{
   list-style: none;

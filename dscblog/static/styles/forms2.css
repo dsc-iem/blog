@@ -1,0 +1,14 @@
+p{
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding: 0rem 0.3rem;
+  justify-content: flex-start;
+}
+p > label{
+  font-size: 1.1rem;
+  color:var(--grey);
+  font-weight: 500;
+  padding: 0.3rem 0.5rem;
+}
+

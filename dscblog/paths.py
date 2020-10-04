@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
 from dscblog.models import User, Blog, Featured
+from dscblog.forms import UserSettingsForm
 import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
@@ -49,6 +50,21 @@ def top25(request):
 @login_required
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
+
+
+@login_required
+def user_settings(request):
+    if request.method == 'POST':
+        form = UserSettingsForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('/profile')
+    else:
+        form = UserSettingsForm(instance=request.user)
+    opts = {'header': {
+        'is_loggedin': True, 'is_empty': False},
+        'form': form}
+    return render(request, 'userSettings.html',opts)
 
 
 def profile(request, username):

@@ -46,6 +46,7 @@ class User(AbstractUser):
     )
     name = models.CharField(max_length=100, verbose_name='Name')
     avatar_url = models.CharField(max_length=250, null=True, default=None)
+    bio = models.CharField(max_length=300, blank=True, default='', verbose_name='Bio')
     first_name = None
     last_name = None
     REQUIRED_FIELDS = []
@@ -57,6 +58,7 @@ class User(AbstractUser):
 
     def get_profile(self, user=None):
         obj = self.get_profile_min()
+        obj['bio']=self.bio
         obj['blogs'] = []
         if user != self:
             blogs = self.get_published_blogs()

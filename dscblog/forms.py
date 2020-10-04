@@ -1,6 +1,8 @@
 from allauth.account.forms import *
 from django import forms
+from django.forms import ModelForm
 from django.contrib.auth import get_user_model
+from dscblog.models import User, Blog
 
 
 class loginForm(LoginForm):
@@ -23,3 +25,14 @@ class signupForm(SignupForm):
         # Add your own processing here.
         # You must return the original result.
         return user
+
+
+class UserSettingsForm(ModelForm):
+    avatar_url = forms.CharField(required=False,label='Picture URL')
+    bio = forms.CharField(required=False,label='Bio',widget=forms.Textarea)
+    class Meta:
+         model = User
+         fields = ['name', 'username', 'avatar_url','bio']
+         labels = {
+            'name': 'Full name'
+        }
