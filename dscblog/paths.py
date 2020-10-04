@@ -156,6 +156,40 @@ def blog_edit(request, id):
 
 
 @require_http_methods(["POST"])
+def follow_user(request):
+    if request.user.is_authenticated:
+        if 'user_id' in request.POST:
+            try:
+                target=User.get_by_id(request.POST['user_id'])
+            except:
+                return apiRespond(400, msg='Target user not found')
+            else:
+                result=request.user.follow(target)
+                return apiRespond(201, result=result)
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def unfollow_user(request):
+    if request.user.is_authenticated:
+        if 'user_id' in request.POST:
+            try:
+                target=User.get_by_id(request.POST['user_id'])
+            except:
+                return apiRespond(400, msg='Target user not found')
+            else:
+                result=request.user.unfollow(target)
+                return apiRespond(201, result=result)
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
 def set_blog_title(request):
     if request.user.is_authenticated:
         if 'blog_id' in request.POST and 'title' in request.POST:

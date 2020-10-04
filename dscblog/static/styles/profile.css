@@ -1,5 +1,8 @@
+#cont{
+padding-top: 2rem;
+}
 #s1{
-    padding: 2rem 1rem;
+    padding: 1rem;
     padding-bottom: 1rem;
     display: flex;
     align-items: center;
@@ -16,6 +19,14 @@
     color: var(--grey);
     font-weight: 400;
     max-width: 28rem;
+}
+#followers_count{
+    padding-right: 1rem;
+    font-size: 0.9rem;
+}
+#followsYou{
+    padding: 1rem;
+    padding-top: 0px;
 }
 #s1_img{
     height: 6rem;
@@ -35,6 +46,11 @@
     #s1{
         flex-direction: column;
         text-align: center;
+    }
+    #followsYou{
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     #s2{
         margin: 0.6rem auto;
