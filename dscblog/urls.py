@@ -30,6 +30,7 @@ urlpatterns = [
     path('<slug:slug>,<int:id>/', paths.blog, name='blog'),
     path('create', paths.create, name='create'),
     path('profile', paths.my_profile),
+    path('userSettings', paths.user_settings),
     path('blog/<int:id>/settings', paths.blog_settings, name='blog_settings'),
     path('blog/<int:id>/edit', paths.blog_edit),
     path('@<str:username>', paths.profile),
@@ -42,6 +43,8 @@ urlpatterns = [
     path('api/blog/publish', paths.publish_blog),
     path('api/blog/unpublish', paths.unpublish_blog),
     path('api/blog/delete', paths.delete_blog),
+    path('api/user/follow', paths.follow_user),
+    path('api/user/unfollow', paths.unfollow_user),
 ]
 
 handler404 = 'dscblog.paths.page404'

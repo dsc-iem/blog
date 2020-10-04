@@ -1,18 +1,119 @@
 {% extends "base.html" %}
-{% block title %}{{user.username}}{% endblock %}
+{% block title %}{{user.username}} - DSC IEM{% endblock %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/styles/profile.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
-<div class="container">
-    <div id="s1">
-    {% if user.name %}
-    <div id="s1_title" class="ink-primary base-light">
-        {{user.name}}
-    </div>
+<div class="container" id="cont">
+    {% if user.is_follower %}
+    <div id="followsYou" class="size-xs ink-grey base-regular">Follows you</div>
     {% endif %}
-    <div class="size-s base-semilight ink-grey">@{{user.username}}</div>
-    <hr/>
+    <div id="s1">
+        {% if user.avatar_url %}
+            <div>
+                <img id="s1_img" src="{{user.avatar_url}}" />
+            </div>
+            {% endif %}
+        <div id="s1_txt">
+            {% if user.name %}
+            <div id="s1_title" class="ink-primary base-light">
+                {{user.name}}
+            </div>
+            {% endif %}
+            <div class="size-s base-semilight ink-grey">@{{user.username}}</div>
+        </div>
     </div>
+    <div id="s2" class="center">
+        <a id="followers_count" class="base-light ink-secondary" href="/followers">
+            {{user.followers_count}} followers
+        </a>
+        {% if user.is_self %}
+        <a class="button rounded" href="/userSettings">Settings</a>
+        {% else %}
+        <div class="button rounded" style="display: none;" id="unfollow">Unfollow</div>
+        <div class="button blue ink-white rounded" id="follow">Follow</div>
+        {% endif %}
+    </div>
+    {% if user.bio %}
+    <div id="s3">{{user.bio}}</div>
+    {% endif %}
+    <hr />
+    <br/>
     {% include "parts/blogsGrid.html" with items=user.blogs  %}
 </div>
+<script>
+    const user_id={{user.user_id}}
+    var followers_count={{user.followers_count}}
+    var is_loading=false;
+    var is_following='{{user.is_following}}'
+    if(is_following=='True'){
+        is_following=true
+    }
+    else 
+    is_following=false
+    var api = new window.Api();
+    function renderCount(){
+        $("#followers_count").html(followers_count+' followers')
+    }
+    function renderButton(){
+        if(is_following){
+        $("#follow").css({display:'none'})
+        $("#unfollow").css({display:'block'})
+        $("#unfollow").html('Unfollow')
+    }
+    else{
+        $("#follow").css({display:'block'})
+        $("#unfollow").css({display:'none'})
+        $("#follow").html('Follow')
+    }
+    }
+    renderButton()
+    function follow () {
+        if(!is_loading){
+        is_loading=true;
+        $("#follow").html('Loading')
+        api.post('user/follow', {
+            user_id
+        }, (code, res) => {
+            is_loading = false
+            if (code == 201) {
+                if(res.result){
+                followers_count++;
+                is_following=true;
+                renderCount();
+            }
+            renderButton();
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/accounts/login?next="+window.location.href
+            }
+        })
+    }
+    }
+    function unfollow () {
+        if(!is_loading){
+        is_loading=true;
+        $("#unfollow").html('Loading')
+        api.post('user/unfollow', {
+            user_id
+        }, (code, res) => {
+            is_loading = false
+            if (code == 201) {
+                if(res.result){
+                followers_count--;
+                is_following=false;
+                renderCount();
+                }
+                renderButton()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/accounts/login?next="+window.location.href
+            }
+        })
+    }
+    }
+    $("#unfollow").on('click',unfollow)
+    $("#follow").on('click',follow)
+</script>
 {% endblock %}

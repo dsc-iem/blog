@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}User settings{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/styles/forms2.css" />
+
+<div class="container">
+    <br />
+    <div class="ink-primary size-xxl base-light">
+        User settings
+    </div>
+    <hr />
+        <form method="post">
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    <br/>
+</div>
+
+{% endblock %}

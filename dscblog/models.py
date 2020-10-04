@@ -46,6 +46,8 @@ class User(AbstractUser):
     )
     name = models.CharField(max_length=100, verbose_name='Name')
     avatar_url = models.CharField(max_length=250, null=True, default=None)
+    bio = models.CharField(max_length=300, blank=True,
+                           default='', verbose_name='Bio')
     first_name = None
     last_name = None
     REQUIRED_FIELDS = []
@@ -53,10 +55,15 @@ class User(AbstractUser):
     objects = UserManager()
 
     def get_profile_min(self):
-        return {'username': self.username, 'name': self.name, 'avatar_url': self.avatar_url}
+        return {'user_id':self.id,'username': self.username, 'name': self.name, 'avatar_url': self.avatar_url}
 
     def get_profile(self, user=None):
         obj = self.get_profile_min()
+        obj['bio'] = self.bio
+        obj['followers_count']=self.followers_count()
+        if user != None:
+            obj['is_following'] = user.is_following(self)
+            obj['is_follower'] = user.is_follower(self)
         obj['blogs'] = []
         if user != self:
             blogs = self.get_published_blogs()
@@ -76,6 +83,42 @@ class User(AbstractUser):
         self.avatar_url = avatar_url
         self.save()
 
+    def follow(self, target):
+        try:
+            follow_obj = Follower.follow(self, target)
+        except:
+            return False
+        else:
+            return True
+
+    def unfollow(self, target):
+        try:
+            follow_obj = Follower.get_by_users(user=self,target=target)
+        except Exception as e:
+            return False
+        else:
+            follow_obj.unfollow()
+            return True
+
+    def is_follower(self, user):
+        try:
+            follow_obj = self.followers.get(user=user)
+        except:
+            return False
+        else:
+            return True
+
+    def is_following(self, target):
+        try:
+            follow_obj = self.following.get(target=target)
+        except:
+            return False
+        else:
+            return True
+
+    def followers_count(self):
+        return self.followers.count()
+        
     def get_all_blogs(self):
         blogs = self.blogs.filter(author=self).order_by(
             '-modified_on', '-created_on')
@@ -95,6 +138,37 @@ class User(AbstractUser):
         return cls.objects.get(username=pk)
 
 
+class Follower(models.Model):
+    user = models.ForeignKey(
+        User, related_name="following", on_delete=models.CASCADE)
+    target = models.ForeignKey(
+        User, related_name="followers", on_delete=models.CASCADE)
+    date = models.DateTimeField()
+
+    class Meta:
+        unique_together = ['user', 'target']
+
+    def unfollow(self):
+        self.delete()
+
+    def __str__(self):
+        return self.user.username+' > '+self.target.username
+
+    @classmethod
+    def follow(cls, user, target):
+        existing = cls.objects.filter(user=user, target=target).count()
+        if existing == 0:
+            obj = cls(user=user, target=target, date=timezone.now())
+            obj.save()
+            return obj
+        else:
+            raise ValueError("Already following")
+
+    @classmethod
+    def get_by_users(cls, user, target):
+        return cls.objects.get(user=user, target=target)
+
+
 class Blog(models.Model):
     title = models.CharField(max_length=60, verbose_name='Title')
     img_url = models.CharField(max_length=150, null=True, default=None)
@@ -112,11 +186,11 @@ class Blog(models.Model):
                'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
         return obj
 
-    def get_obj(self,escape_html=True):
+    def get_obj(self, escape_html=True):
         obj = self.get_obj_min()
         obj['content'] = self.content
         if not escape_html:
-            obj['content']=html.unescape(obj['content'])
+            obj['content'] = html.unescape(obj['content'])
         return obj
 
     def get_slug(self):
