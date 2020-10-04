@@ -173,7 +173,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=60, verbose_name='Title')
     img_url = models.CharField(max_length=150, null=True, default=None)
     content = models.CharField(
-        max_length=1500, verbose_name='Content', default='')
+        max_length=3500, verbose_name='Content', default='')
     author = models.ForeignKey(
         User, related_name="blogs", on_delete=models.CASCADE)
     created_on = models.DateTimeField()
