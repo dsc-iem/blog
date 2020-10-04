@@ -78,7 +78,7 @@ def profile(request, username):
     except:
         return page404(request)
     else:
-        opts['user'] = user.get_profile(request.user)
+        opts['user'] = user.get_profile(request.user if request.user.is_authenticated else None)
         res = render(request, 'profile.html', opts)
         return res
 
