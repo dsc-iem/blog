@@ -249,6 +249,38 @@ class Blog(models.Model):
     def __str__(self):
         return str(self.id)+'. '+self.title
 
+'''
+class Reaction(models.Model):
+    user = models.ForeignKey(
+        User, related_name="reacted", on_delete=models.CASCADE)
+    blog = models.ForeignKey(
+        Blog, related_name="reactions", on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    reaction = models.Choices()
+
+    class Meta:
+        unique_together = ['user', 'blog']
+
+    def unreact(self):
+        self.delete()
+
+    def __str__(self):
+        return self.user.username+' > '+self.blog.title
+
+    @classmethod
+    def react(cls, user,blog, reaction):
+        existing = cls.objects.filter(user=user, blog=blog).count()
+        if existing == 0:
+            obj = cls(user=user, blog=blog, date=timezone.now())
+            obj.save()
+            return obj
+        else:
+            raise ValueError("Already reacted")
+
+    @classmethod
+    def get_by_users(cls, user, target):
+        return cls.objects.get(user=user, target=target)
+'''
 
 class Featured(models.Model):
     info = models.CharField(
