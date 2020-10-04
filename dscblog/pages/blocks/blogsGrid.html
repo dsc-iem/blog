@@ -1,0 +1,36 @@
+{% if items %}
+<div class="blogs_grid">
+    {% for item in items %}
+    <div class="blog_item" onclick="openLink('{{item.blog_url}}')" style="background-image: url({{item.img_url}});">
+            <div class="bi_cover"></div>
+            <div class="bi_txt">
+                <div class="bi_info">
+                    {% if is_owner %}
+                    <div class="hstack space-between bi_opts">
+                        {% if not item.is_published %}
+                            <div class="bi_locked" ></div>
+                        {% endif %}
+                        <div style="display:flex">
+                            <a href="/blog/{{item.blog_id}}/edit" class="bi_opt center">
+                                Edit
+                            </a>
+                            <a href="/blog/{{item.blog_id}}/settings" class="bi_opt center">
+                                Settings
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="size-s ink-light base-semilight bi_author">
+                        {{item.author.username}}
+                    </div>
+                    {% endif %}
+                    <a  href="{{item.blog_url}}" class="size-m ink-white base-regular bi_title">{{item.title}}</a>
+                </div>
+                <div>
+                    <!-- put likes and comments here -->
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
