@@ -55,12 +55,12 @@ class User(AbstractUser):
     objects = UserManager()
 
     def get_profile_min(self):
-        return {'user_id':self.id,'username': self.username, 'name': self.name, 'avatar_url': self.avatar_url}
+        return {'user_id': self.id, 'username': self.username, 'name': self.name, 'avatar_url': self.avatar_url}
 
     def get_profile(self, user=None):
         obj = self.get_profile_min()
         obj['bio'] = self.bio
-        obj['followers_count']=self.followers_count()
+        obj['followers_count'] = self.followers_count()
         if user != None:
             obj['is_following'] = user.is_following(self)
             obj['is_follower'] = user.is_follower(self)
@@ -93,7 +93,7 @@ class User(AbstractUser):
 
     def unfollow(self, target):
         try:
-            follow_obj = Follower.get_by_users(user=self,target=target)
+            follow_obj = Follower.get_by_users(user=self, target=target)
         except Exception as e:
             return False
         else:
@@ -118,7 +118,7 @@ class User(AbstractUser):
 
     def followers_count(self):
         return self.followers.count()
-        
+
     def get_all_blogs(self):
         blogs = self.blogs.filter(author=self).order_by(
             '-modified_on', '-created_on')
@@ -128,6 +128,23 @@ class User(AbstractUser):
         blogs = self.blogs.filter(author=self, is_published=True).order_by(
             '-published_on', '-modified_on')
         return blogs
+
+    def react(self, blog, reaction):
+        try:
+            obj = Reaction.react(user=self, blog=blog, reaction=reaction)
+        except:
+            return None
+        else:
+            return obj
+
+    def unreact(self, blog):
+        try:
+            obj = Reaction.objects.get(user=self, blog=blog)
+        except:
+            return False
+        else:
+            obj.unreact()
+            return True
 
     @classmethod
     def get_by_id(cls, pk):
@@ -186,12 +203,33 @@ class Blog(models.Model):
                'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
         return obj
 
-    def get_obj(self, escape_html=True):
+    def get_obj(self, user=None, escape_html=True):
         obj = self.get_obj_min()
         obj['content'] = self.content
+        obj['reaction_counts'] = self.get_reaction_counts()
+        obj['user_reaction'] = None
+        if user != None:
+            react_obj = self.get_user_reaction(user)
+            if react_obj != None:
+                obj['user_reaction'] = react_obj.reaction
         if not escape_html:
             obj['content'] = html.unescape(obj['content'])
         return obj
+
+    def get_reaction_counts(self):
+        counts = {}
+        for react, name in Reaction.REACTS:
+            counts[react] = Reaction.objects.filter(
+                blog=self, reaction=react).count()
+        return counts
+
+    def get_user_reaction(self, user):
+        try:
+            react = Reaction.objects.get(user=user, blog=self)
+        except:
+            return None
+        else:
+            return react
 
     def get_slug(self):
         return slugify(self.title)
@@ -249,14 +287,31 @@ class Blog(models.Model):
     def __str__(self):
         return str(self.id)+'. '+self.title
 
-'''
+
 class Reaction(models.Model):
+    LIKE = 'LIK'
+    LOVE = 'LOV'
+    LIT = 'LIT'
+    COOL = 'COL'
+    CLAP = 'CLP'
+    REACTS = [
+        (LIKE, 'Like'),
+        (LOVE, 'Love'),
+        (LIT, 'Lit'),
+        (COOL, 'Cool'),
+        (CLAP, 'Clap'),
+    ]
+    CODES = {LIKE, LOVE, LIT, COOL, CLAP}
     user = models.ForeignKey(
         User, related_name="reacted", on_delete=models.CASCADE)
     blog = models.ForeignKey(
         Blog, related_name="reactions", on_delete=models.CASCADE)
     date = models.DateTimeField()
-    reaction = models.Choices()
+    reaction = models.CharField(
+        max_length=3,
+        choices=REACTS,
+        default=LIKE,
+    )
 
     class Meta:
         unique_together = ['user', 'blog']
@@ -268,19 +323,23 @@ class Reaction(models.Model):
         return self.user.username+' > '+self.blog.title
 
     @classmethod
-    def react(cls, user,blog, reaction):
-        existing = cls.objects.filter(user=user, blog=blog).count()
-        if existing == 0:
-            obj = cls(user=user, blog=blog, date=timezone.now())
+    def react(cls, user, blog, reaction):
+        try:
+            existing = cls.objects.get(user=user, blog=blog)
+        except:
+            obj = cls(user=user, blog=blog,
+                      reaction=reaction, date=timezone.now())
             obj.save()
             return obj
         else:
-            raise ValueError("Already reacted")
+            existing.reaction = reaction
+            existing.save()
+            return existing
 
     @classmethod
-    def get_by_users(cls, user, target):
-        return cls.objects.get(user=user, target=target)
-'''
+    def get_by_user_and_blog(cls, user, blog):
+        return cls.objects.get(user=user, blog=blog)
+
 
 class Featured(models.Model):
     info = models.CharField(

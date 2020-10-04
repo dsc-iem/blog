@@ -39,6 +39,72 @@
     {{html}}
     {% endautoescape %}
 </div>
+<div id="react_box" class="center">
+    <div class="react" id="like">👍<div class="react_count" id="like_count">{{blog.reaction_counts.LIK}}</div></div>
+    <div class="react" id="love">❤<div class="react_count" id="love_count">{{blog.reaction_counts.LOV}}</div></div>
+    <div class="react" id="lit">🔥<div class="react_count" id="lit_count">{{blog.reaction_counts.LIT}}</div></div>
+    <div class="react" id="cool">🆒<div class="react_count" id="cool_count">{{blog.reaction_counts.COL}}</div></div>
+    <div class="react" id="clap">👏<div class="react_count" id="clap_count">{{blog.reaction_counts.CLP}}</div></div>
+</div>
 <br />
 <br />
+<script>
+    const REACTS={
+    'LIK':'like',
+    'LOV':'love',
+    'LIT' :'lit',
+    'COL' : 'cool',
+    'CLP' : 'clap',
+    'None': null
+    }
+    var counts={
+        like:{{blog.reaction_counts.LIK}},
+        love:{{blog.reaction_counts.LOV}},
+        lit:{{blog.reaction_counts.LIT}},
+        cool:{{blog.reaction_counts.COL}},
+        clap:{{blog.reaction_counts.CLP}}
+    }
+    var currentReact=REACTS['{{blog.user_reaction}}']
+    var blog_id={{blog.blog_id}}
+    var is_loading=false;
+    var api = new window.Api();
+    function renderReacts(){
+        Object.keys(counts).forEach(react => {
+            $("#"+react).removeClass('active');
+            $("#"+react+'_count').html(counts[react]);
+            if(currentReact==react){
+                $("#"+react).addClass('active');
+            }
+        });
+    }
+    renderReacts();
+    function react(code){
+        if(!is_loading){
+        is_loading=true;
+        api.post('blog/react', {
+            reaction:code,
+            blog_id
+        }, (scode, res) => {
+            is_loading = false
+            if (scode == 201) {
+                if(currentReact!=REACTS[code]){
+                    counts[currentReact]--;
+                    counts[REACTS[code]]++;
+                }
+                currentReact=REACTS[code]
+                renderReacts();
+            } else if (scode == 400) {
+                alert(res.msg);
+            } else if (scode == 401) {
+                window.location.href = "/accounts/login?next="+window.location.href
+            }
+        })
+    }
+    }
+    $("#like").on('click',function(){react('LIK')})
+    $("#love").on('click',function(){react('LOV')})
+    $("#lit").on('click',function(){react('LIT')})
+    $("#cool").on('click',function(){react('COL')})
+    $("#clap").on('click',function(){react('CLP')})
+</script>
 {% endblock %}

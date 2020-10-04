@@ -3,14 +3,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
-from dscblog.models import User, Blog, Featured
+from dscblog.models import User, Blog, Featured, Reaction
 from dscblog.forms import UserSettingsForm
 import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
 
 md = markdown.Markdown(
-    extensions=['extra','markdown.extensions.codehilite', PyEmbedMarkdown()])
+    extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
 
 
 def index(request):
@@ -64,7 +64,7 @@ def user_settings(request):
     opts = {'header': {
         'is_loggedin': True, 'is_empty': False},
         'form': form}
-    return render(request, 'userSettings.html',opts)
+    return render(request, 'userSettings.html', opts)
 
 
 def profile(request, username):
@@ -78,7 +78,8 @@ def profile(request, username):
     except:
         return page404(request)
     else:
-        opts['user'] = user.get_profile(request.user if request.user.is_authenticated else None)
+        opts['user'] = user.get_profile(
+            request.user if request.user.is_authenticated else None)
         res = render(request, 'profile.html', opts)
         return res
 
@@ -93,7 +94,7 @@ def blog(request, slug, id):
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
-                    'blog': b.get_obj(),
+                    'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': md.reset().convert(b.content),
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
@@ -160,11 +161,11 @@ def follow_user(request):
     if request.user.is_authenticated:
         if 'user_id' in request.POST:
             try:
-                target=User.get_by_id(request.POST['user_id'])
+                target = User.get_by_id(request.POST['user_id'])
             except:
                 return apiRespond(400, msg='Target user not found')
             else:
-                result=request.user.follow(target)
+                result = request.user.follow(target)
                 return apiRespond(201, result=result)
         else:
             return apiRespond(400, msg='Required fields missing')
@@ -177,12 +178,47 @@ def unfollow_user(request):
     if request.user.is_authenticated:
         if 'user_id' in request.POST:
             try:
-                target=User.get_by_id(request.POST['user_id'])
+                target = User.get_by_id(request.POST['user_id'])
             except:
                 return apiRespond(400, msg='Target user not found')
             else:
-                result=request.user.unfollow(target)
+                result = request.user.unfollow(target)
                 return apiRespond(201, result=result)
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def blog_react(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST and 'reaction' in request.POST and request.POST['reaction'] in Reaction.CODES:
+            reaction = request.POST['reaction']
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Target blog not found')
+            else:
+                obj = request.user.react(blog=b, reaction=reaction)
+                return apiRespond(201, result=True)
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def blog_unreact(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Target blog not found')
+            else:
+                res = request.user.unreact(blog=b)
+                return apiRespond(201, result=res)
         else:
             return apiRespond(400, msg='Required fields missing')
     else:
