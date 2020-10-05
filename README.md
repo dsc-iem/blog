@@ -1,12 +1,18 @@
 # DSC-IEM Blog 📰
 
+![logo](img/logo.svg)
+
 Blogs for tech and beyond from DSC-IEM community.
-With the help of this project we hope to give the students of this community a platform to share,
+With the help of this project we hope to provide the students of this community a platform to share,
 showcase and help each other in their exciting journey of learning and building amazing things.
+
+![home](screenshots/home.png)
 
 ## About the codebase 📁
 
 We are using Python 🐍 and Django for our blog server
+
+![home1](screenshots/home1.png)
 
 ## How to start working on the server code ⚒
 
