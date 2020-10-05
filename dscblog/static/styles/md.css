@@ -4,7 +4,11 @@
 
 .markdown {
     font-size: 20px;
-    color:var(--grey);
+    color:rgb(105, 105, 105);
+}
+
+[data-theme="dark"] .markdown {
+    color:rgb(179, 179, 179);
 }
 
 .markdown { /* TEXT PARENT */

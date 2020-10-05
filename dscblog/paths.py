@@ -343,7 +343,7 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content = html.escape(request.POST['content'])
+                    content = html.escape(request.POST['content']).replace('&gt;', '>')
                     b.update_content(content)
                     return apiRespond(201)
                 else:

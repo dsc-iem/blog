@@ -119,6 +119,9 @@ class User(AbstractUser):
     def followers_count(self):
         return self.followers.count()
 
+    def get_followers(self):
+        return self.followers.all()
+
     def get_all_blogs(self):
         blogs = self.blogs.filter(author=self).order_by(
             '-modified_on', '-created_on')
