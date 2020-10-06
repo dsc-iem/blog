@@ -149,6 +149,15 @@ class User(AbstractUser):
             obj.unreact()
             return True
 
+    def comment(self, blog, text, reference=None):
+        try:
+            obj = Comment.create(user=self, blog=blog,
+                                 text=text, reference=reference)
+        except:
+            return None
+        else:
+            return obj
+
     @classmethod
     def get_by_id(cls, pk):
         return cls.objects.get(id=pk)
@@ -210,6 +219,7 @@ class Blog(models.Model):
         obj = self.get_obj_min()
         obj['content'] = self.content
         obj['reaction_counts'] = self.get_reaction_counts()
+        obj['comments_count'] = self.get_comments_count()
         obj['user_reaction'] = None
         if user != None:
             react_obj = self.get_user_reaction(user)
@@ -218,6 +228,12 @@ class Blog(models.Model):
         if not escape_html:
             obj['content'] = html.unescape(obj['content'])
         return obj
+
+    def get_comments_count(self):
+        return Comment.objects.filter(blog=self).count()
+
+    def get_comments(self):
+        return Comment.objects.filter(blog=self).order_by('-id')
 
     def get_reaction_counts(self):
         counts = {}
@@ -322,6 +338,11 @@ class Reaction(models.Model):
     def unreact(self):
         self.delete()
 
+    def get_obj(self):
+        obj = {'user': self.user.get_profile_min(),
+               'blog_id': self.blog.id, 'date': self.date, 'reaction': self.reaction}
+        return obj
+
     def __str__(self):
         return self.user.username+' > '+self.blog.title
 
@@ -342,6 +363,48 @@ class Reaction(models.Model):
     @classmethod
     def get_by_user_and_blog(cls, user, blog):
         return cls.objects.get(user=user, blog=blog)
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        User, related_name="commented", on_delete=models.CASCADE)
+    text = models.CharField(
+        max_length=300, verbose_name='Text', blank=True, default='')
+    blog = models.ForeignKey(
+        Blog, related_name="comments", on_delete=models.CASCADE)
+    reference = models.ForeignKey(
+        'Comment', related_name="replies", null=True, default=None, on_delete=models.SET_NULL)
+    date = models.DateTimeField()
+
+    def delete(self):
+        self.delete()
+
+    def get_obj(self, user=None):
+        obj = {'user': self.user.get_profile_min(), 'comment_id': self.id, 'is_mine': False,
+               'blog_id': self.blog.id, 'date': self.date, 'text': self.text, 'reference': None}
+        if self.reference != None:
+            obj['reference'] = {'user': self.reference.user.get_profile_min(),
+                                'text': self.reference.text, 'comment_id': self.reference.id}
+        if user != None and user == self.user:
+            obj['is_mine'] = True
+        return obj
+
+    def reply(self, user, text):
+        return Comment.create(user=user, blog=self.blog, reference=self)
+
+    @classmethod
+    def create(cls, user, blog, text, reference=None):
+        obj = cls(user=user, blog=blog,
+                  text=text, date=timezone.now(), reference=reference)
+        obj.save()
+        return obj
+
+    @classmethod
+    def get_by_id(cls, pk):
+        return cls.objects.get(id=pk)
+
+    def __str__(self):
+        return str(self.user.id)+' > '+self.blog.title
 
 
 class Featured(models.Model):

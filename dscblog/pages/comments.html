@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}
+Comments - {{blog.title}} - DSC IEM Blogs
+{% endblock %}
+{% block root %}
+<link rel="stylesheet" type="text/css" href="/static/styles/comments.css" />
+<div id="bar">
+    <div class="size-s ink-primary base-regular center">Comments</div>
+</div>
+<div id="comments">
+    {% for item in comments %}
+    <div id="c{{item.comment_id}}" class="comment_item">
+        <div class="comm_head">
+            {% if item.user.avatar_url %}
+            <a href="/@{{item.user.username}}" class="comm_img" style="background-image: url('{{item.user.avatar_url}}');"></a>
+            {% endif %}
+            <a href="/@{{item.user.username}}" class="comm_username size-xs base-regular ink-primary">{{item.user.username}}</a>
+        </div>
+        {% if item.reference != None %}
+        <div class="comm_ref" onclick="foc('{{item.reference.comment_id}}')">
+            <div class="comm_head">
+                <a href="/@{{item.reference.user.username}}" class="comm_username size-xs base-regular ink-primary">
+                    {{item.reference.user.username}}
+                </a>
+            </div>
+            <div class="comm_text">{{item.reference.text}}</div>
+        </div>
+        {% endif %}
+        <div id="c{{item.comment_id}}_text" class="comm_text">
+            {{item.text}}
+        </div>
+        <div class="comm_date">{{item.date}}</div>
+        <div class="clickable ink-blue comm_reply_button" onclick="quote({{item.comment_id}})">Reply</div>
+    </div>
+    {% endfor %}
+</div>
+<div id="comment_box">
+    <div id="quote">
+        <div id="quote_text"></div>
+        <div class="clickable center base-regular" id="unquote" onclick="unquote()">X</div>
+    </div>
+    <div id="comm_box_controls">
+      <textarea placeholder="Comment" id="comm_input"></textarea>
+      <div class="center">
+        <div id="comm_post" class="clickable size-xs base-semilight center" onclick="post()">Post</div> 
+      </div> 
+    </div>
+</div>
+<br />
+<br />
+<br />
+<script>
+var blog_id={{blog.blog_id}}
+var ref_id=null;
+var api = new window.Api();
+function comment(text,ref_id=null){
+var opts={blog_id,text}
+if(ref_id){
+    opts.ref_comment_id=parseInt(ref_id)
+}
+api.post('blog/comment', opts, (scode, res) => {
+            if (scode == 201) {
+                console.log('comment posted!')
+                window.location.reload()
+            } else if (scode == 400) {
+                alert(res.msg);
+            } else if (scode == 401) {
+                window.location.href = "/accounts/login?next="+window.location.href
+            }
+        })
+}
+function post(){
+comment($("#comm_input").val().trim(),ref_id)
+}
+function quote(id){
+    var text=escapeHtml($(`#c${id}_text`).text())
+    $("#comm_input").focus()
+    $("#quote").css({display:'grid'});
+    ref_id=id;
+    $("#quote_text").html(text);
+}
+function unquote(){
+    $("#quote").css({display:'none'});
+    ref_id=null;
+    $("#quote_text").html('');
+}
+$('document').ready(()=>{
+    window.setTimeout(()=>{
+        var top = document.documentElement.scrollHeight;
+    window.scrollTo(0, top);
+},200)
+})
+function foc(id){
+document.getElementById('c'+id).scrollIntoView({behavior: "smooth",block: "nearest", inline: "nearest"})
+$('#c'+id).addClass('focus');
+window.setTimeout(()=>{
+    $('#c'+id).removeClass('focus');
+},1000)
+}
+</script>
+{% endblock %}
