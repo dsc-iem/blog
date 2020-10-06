@@ -28,6 +28,7 @@ urlpatterns = [
     path('None', RedirectView.as_view(url='/static/media/none.png', permanent=True)),
     path('explore', RedirectView.as_view(url='/', permanent=True)),
     path('<slug:slug>,<int:id>/', paths.blog, name='blog'),
+    path('blog/<int:blog_id>/comments', paths.blog_comments),
     path('create', paths.create, name='create'),
     path('profile', paths.my_profile),
     path('userSettings', paths.user_settings),
@@ -47,6 +48,8 @@ urlpatterns = [
     path('api/user/unfollow', paths.unfollow_user),
     path('api/blog/react', paths.blog_react),
     path('api/blog/unreact', paths.blog_unreact),
+    path('api/blog/comment', paths.blog_comment),
+    path('api/blog/uncomment', paths.blog_uncomment),
 ]
 
 handler404 = 'dscblog.paths.page404'

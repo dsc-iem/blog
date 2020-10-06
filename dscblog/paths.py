@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
-from dscblog.models import User, Blog, Featured, Reaction
+from dscblog.models import User, Blog, Featured, Reaction, Comment
 from dscblog.forms import UserSettingsForm
 import markdown
 import html
@@ -105,6 +105,26 @@ def blog(request, slug, id):
                 return page404(request)
         else:
             return redirect(to=b.get_url())
+
+
+def blog_comments(request, blog_id):
+    try:
+        b = Blog.get_by_id(blog_id)
+    except:
+        return page404(request)
+    else:
+        user = request.user if request.user.is_authenticated else None
+        if b.is_published or (request.user.is_authenticated and request.user == b.author):
+            opts = {'comments': [],
+                    'blog': b.get_obj_min(),
+                    'is_owner': request.user.is_authenticated and request.user == b.author}
+            comments = b.get_comments()
+            for comment in comments:
+                opts['comments'].append(comment.get_obj(user=user))
+            res = render(request, 'comments.html', opts)
+            return res
+        else:
+            return page404(request)
 
 
 @login_required
@@ -219,6 +239,49 @@ def blog_unreact(request):
             else:
                 res = request.user.unreact(blog=b)
                 return apiRespond(201, result=res)
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def blog_comment(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST and 'text' in request.POST and len(request.POST['text'].strip()) > 2:
+            ref = None
+            if 'ref_comment_id' in request.POST:
+                ref_id = request.POST['ref_comment_id']
+                try:
+                    ref = Comment.get_by_id(ref_id)
+                except:
+                    return apiRespond(400, msg='Reference comment not found')
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Target blog not found')
+            else:
+                comment = request.user.comment(
+                    blog=b, text=request.POST['text'].strip(), reference=ref)
+                return apiRespond(201, comment=comment.get_obj())
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def blog_uncomment(request):
+    if request.user.is_authenticated:
+        if 'comment_id' in request.POST:
+            try:
+                comment = Comment.get_by_id(request.POST['comment_id'])
+            except:
+                return apiRespond(400, msg='Target comment not found')
+            else:
+                if comment.user == request.user:
+                    comment.delete()
+                return apiRespond(201, result=True)
         else:
             return apiRespond(400, msg='Required fields missing')
     else:
@@ -343,7 +406,8 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content = html.escape(request.POST['content']).replace('&gt;', '>')
+                    content = html.escape(
+                        request.POST['content']).replace('&gt;', '>')
                     b.update_content(content)
                     return apiRespond(201)
                 else:

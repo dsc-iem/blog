@@ -82,3 +82,12 @@
         justify-content: space-around;
     }
 }
+#comments_button{
+    background-color: rgba(0, 195, 255, 0.274);
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+}
+#comments_button:hover{
+    background-color: rgba(0, 183, 255, 0.753);
+    color: var(--bg);
+}
