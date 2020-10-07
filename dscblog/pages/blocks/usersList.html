@@ -1,6 +1,34 @@
 {% extends 'base.html' %}
 {% block title %}Followers{% endblock %}
-
 {% block content %}
-<p>This will be fer followers</p>
+<link rel="stylesheet" type="text/css" href="/static/xui/xui.css">
+<link rel="stylesheet" type="text/css" href="/static/styles/profile.css" />
+
+
+<div class="container" id="cont">
+    <div id="s1">
+        {% if user.avatar_url %}
+        <div>
+            <img id="s1_img" src="{{user.avatar_url}}" />
+        </div>
+        {% endif %}
+        {% if user.get_followers %}
+            <div id="s1_txt">
+                <div id="s1_title" class="ink-primary base-light">
+                    {{ user.name }}'s Followers
+                </div> 
+                {% for user in chaselist %}
+                    <ul id='f'>
+                        <li>{{ user.name }}</li>
+                    </ul>
+            {% endfor %}
+            </div>  
+        {% else %}
+            <div id="s1_title" class="ink-primary base-light">
+                {{ user.name }} currently has no followers
+            </div> 
+        {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}
