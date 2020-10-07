@@ -51,6 +51,11 @@ def top25(request):
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
 
+@login_required
+def followers(request):
+    data = {'header':{'is_loggedin':True}}
+    return render(request, 'blocks/usersList.html', data)
+
 
 @login_required
 def user_settings(request):

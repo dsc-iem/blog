@@ -30,6 +30,7 @@ urlpatterns = [
     path('<slug:slug>,<int:id>/', paths.blog, name='blog'),
     path('create', paths.create, name='create'),
     path('profile', paths.my_profile),
+    path('followers', paths.followers, name='followers'),
     path('userSettings', paths.user_settings),
     path('blog/<int:id>/settings', paths.blog_settings, name='blog_settings'),
     path('blog/<int:id>/edit', paths.blog_edit),
