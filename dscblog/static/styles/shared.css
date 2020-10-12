@@ -163,6 +163,12 @@ textarea {
   margin-left: 1rem;
 }
 
-#f{
-  list-style-type:None;
+#tiny {
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 50%;
+  object-position: center;
+  
 }
+
+

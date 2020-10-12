@@ -130,3 +130,7 @@ dscblog/settings_dev.prod.py
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Test_data
+test_pics/
+misc.txt
