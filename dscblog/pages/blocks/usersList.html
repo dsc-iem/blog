@@ -17,13 +17,17 @@
                 {{ user.name }}'s Followers
             </div>
             <div>
-            <table>
+            <table class="t1">
             {% for user in chaselist %}
                 <tr>
-                    <td>                    
                     {% if user.avatar_url %}
-                    <img id="tiny" src="{{ user.avatar_url }}" />                                                    
+                    <td scope="col">                                        
+                        <img id="tiny" src="{{ user.avatar_url }}" />                                                    
+                    {% else %}
+                    <td></td>
                     {% endif %}
+                    </td>
+                    <td scope="col">
                     <a href="@{{ user.username }}">{{ user.name }}</a>
                     </td>
                 </tr>
