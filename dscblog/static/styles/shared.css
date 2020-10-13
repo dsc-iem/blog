@@ -162,3 +162,16 @@ textarea {
 .toggle-button.active > .inner-circle {
   margin-left: 1rem;
 }
+
+#tiny {
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 50%;
+  object-position: center;
+  
+}
+.t1{
+  margin-top: 20px;
+}
+
+

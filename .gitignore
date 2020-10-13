@@ -48,7 +48,11 @@ wheels/
 
 # Installer logs 
 pip-log.txt 
-pip-delete-this-directory.txt 
+pip-delete-this-directory.txt
+
+# log files
+*blog_log* 
+
 
 # Unit test / coverage reports 
 htmlcov/ 
@@ -126,3 +130,7 @@ dscblog/settings_dev.prod.py
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Test_data
+test_pics/
+misc.txt

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Followers{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/styles/profile.css" />
+
+
+<div class="container">
+    <div id="s1">
+        {% if user.avatar_url %}
+        <div>
+            <img id="s1_img" src="{{user.avatar_url}}" />
+        </div>
+        {% endif %}
+        {% if user.get_followers %}
+        <div id="s1_txt">
+            <div id="s1_title" class="ink-primary base-light">
+                {{ user.name }}'s Followers
+            </div>
+            <div>
+            <table class="t1">
+            {% for user in chaselist %}
+                <tr>
+                    {% if user.avatar_url %}
+                    <td scope="col">                                        
+                        <img id="tiny" src="{{ user.avatar_url }}" />                                                    
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    </td>
+                    <td scope="col">
+                    <a href="@{{ user.username }}">{{ user.name }}</a>
+                    </td>
+                </tr>
+            {% endfor %} 
+            </table>
+            
+            </div>
+        {% else %}
+            <div id="s1_title" class="ink-primary base-light">
+                {{ user.name }} currently has no followers
+            </div> 
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
