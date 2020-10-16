@@ -1,10 +1,17 @@
 {% extends "base.html" %}
 {% block root %}
+<link rel="stylesheet" type="text/css" href="/static/styles/header.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogEditor.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <div>
+    <div id="header">
+        <div class="title">{{blog.title}}</div>
+        <div id="hd_opts" class="hstack space-around">
+            <a id="doneBtn" class="button rounded" >Done</a>
+        </div>
+    </div>
     <textarea name="content" id="editor" class="markdown">
     {% autoescape on %}
     {{blog.content }}
@@ -57,6 +64,9 @@
     editor.codemirror.on("change", function () {
         var content = editor.value().trim();
         save(content)
+    });
+    document.getElementById("doneBtn").addEventListener("click", function()
+        { save(editor.value().trim());
     });
 </script>
 {% endblock %}
