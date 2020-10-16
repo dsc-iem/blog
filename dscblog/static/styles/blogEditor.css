@@ -8,3 +8,8 @@ html,body{
 .CodeMirror {
 	min-height: 80vh;
 }
+
+.title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
