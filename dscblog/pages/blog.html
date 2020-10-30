@@ -54,6 +54,12 @@
 </div>
 <br />
 <br />
+<div class="container" id="more">
+        <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
+    <hr/>
+    {% include "blocks/blogsGrid.html" with items=more_blogs is_owner=False  %}
+</div>
+<br />
 <script>
     const REACTS={
     'LIK':'like',
@@ -102,7 +108,7 @@
             } else if (scode == 400) {
                 alert(res.msg);
             } else if (scode == 401) {
-                window.location.href = "/accounts/login?next="+window.location.href
+                window.location.href = "/accounts/login?next="+window.location.pathname
             }
         })
     }

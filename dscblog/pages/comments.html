@@ -65,7 +65,7 @@ api.post('blog/comment', opts, (scode, res) => {
             } else if (scode == 400) {
                 alert(res.msg);
             } else if (scode == 401) {
-                window.location.href = "/accounts/login?next="+window.location.href
+                window.location.href = "/accounts/login?next="+window.location.pathname
             }
         })
 }

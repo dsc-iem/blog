@@ -303,6 +303,10 @@ class Blog(models.Model):
     def top25(cls):
         return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:25]
 
+    @classmethod
+    def recent4(cls):
+        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:4]
+
     def __str__(self):
         return str(self.id)+'. '+self.title
 

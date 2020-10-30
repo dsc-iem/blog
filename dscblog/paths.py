@@ -105,7 +105,11 @@ def blog(request, slug, id):
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': md.reset().convert(b.content),
+                    'more_blogs':[],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
+                blogs = Blog.recent4()
+                for b in blogs:
+                    opts['more_blogs'].append(b.get_obj_min())
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                 res = render(request, 'blog.html', opts)
