@@ -21,7 +21,7 @@
                     </div>
                     {% else %}
                     <div class="size-s ink-light base-semilight bi_author">
-                        {{item.author.username}}
+                        {% include "blocks/name.html" with user=item.author %}
                     </div>
                     {% endif %}
                     <a  href="{{item.blog_url}}" class="size-m ink-white base-regular bi_title">{{item.title}}</a>

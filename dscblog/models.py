@@ -202,7 +202,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=60, verbose_name='Title')
     img_url = models.CharField(max_length=150, null=True, default=None)
     content = models.CharField(
-        max_length=3500, verbose_name='Content', default='')
+        max_length=20000, verbose_name='Content', default='')
     author = models.ForeignKey(
         User, related_name="blogs", on_delete=models.CASCADE)
     created_on = models.DateTimeField()
@@ -241,6 +241,11 @@ class Blog(models.Model):
             counts[react] = Reaction.objects.filter(
                 blog=self, reaction=react).count()
         return counts
+
+    def get_reactions(self):
+        reacts = Reaction.objects.filter(
+                blog=self).order_by('-date')
+        return reacts
 
     def get_user_reaction(self, user):
         try:
@@ -302,6 +307,10 @@ class Blog(models.Model):
     @classmethod
     def top25(cls):
         return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:25]
+
+    @classmethod
+    def recent4(cls):
+        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:4]
 
     def __str__(self):
         return str(self.id)+'. '+self.title

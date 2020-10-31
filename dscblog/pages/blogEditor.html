@@ -7,9 +7,9 @@
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <div>
     <div id="header">
-        <div class="title">{{blog.title}}</div>
+        <div class="size-s base-regular ink-black trunc-long" style="padding-left: 0.5rem;">{{blog.title}}</div>
         <div id="hd_opts" class="hstack space-around">
-            <a id="doneBtn" class="button rounded" >Done</a>
+            <a id="doneBtn" class="button rounded ink-blue" >Done</a>
         </div>
     </div>
     <textarea name="content" id="editor" class="markdown">
@@ -29,7 +29,7 @@
     var lastSave=0;
     var unsavedContent=false;
     var saving=false;
-    function save(content) {
+    function save(content, willExit=false) {
         if((new Date().getTime()-lastSave)>2000){
         if(!saving){
         saving=true
@@ -41,7 +41,10 @@
             if (code == 201) {
                 console.log('saved');
                 lastSave=new Date().getTime()
-                unsavedContent=false
+                unsavedContent=false;
+                if(willExit){
+                    window.location.href = "{{blog.blog_url}}"
+                }
             } else if (code == 400) {
                 alert(res.msg);
             } else if (code == 401) {
@@ -66,7 +69,7 @@
         save(content)
     });
     document.getElementById("doneBtn").addEventListener("click", function()
-        { save(editor.value().trim());
+        { save(editor.value().trim(),true);
     });
 </script>
 {% endblock %}

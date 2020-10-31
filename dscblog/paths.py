@@ -9,7 +9,6 @@ import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
 
-from .followers import return_follower_username
 
 md = markdown.Markdown(
     extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
@@ -53,12 +52,39 @@ def top25(request):
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
 
+
+def followers(request, username):
+    try:
+        user = User.get_by_username(username)
+    except:
+        return page404(request)
+    else:
+        data = {'header': {'is_loggedin': True},
+                'user': user.get_profile_min(), 'chaselist': []}
+        chaselist = user.get_followers()
+        for follower in chaselist:
+            data['chaselist'].append(follower.user.get_profile_min())
+        return render(request, 'followers.html', data)
+
+
 @login_required
-def followers(request):
-    data = {'header':{'is_loggedin':True}}
-    chaselist = request.user.get_followers() 
-    data['chaselist'] = return_follower_username(chaselist)
-    return render(request, 'blocks/usersList.html', data)
+def blog_reactions(request, id):
+    try:
+        b = Blog.get_by_id(id)
+    except:
+        return page404(request)
+    else:
+        if request.user == b.author:
+            data = {'header': {'is_loggedin': True},
+                    'users': [],'blog':b.get_obj_min()}
+            reactions = b.get_reactions()
+            for reaction in reactions:
+                obj=reaction.user.get_profile_min()
+                obj['reaction']=reaction.reaction
+                data['users'].append(obj)
+            return render(request, 'reactions.html', data)
+        else:
+            return page404(request)
 
 
 @login_required
@@ -105,7 +131,11 @@ def blog(request, slug, id):
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': md.reset().convert(b.content),
+                    'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
+                blogs = Blog.recent4()
+                for b in blogs:
+                    opts['more_blogs'].append(b.get_obj_min())
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                 res = render(request, 'blog.html', opts)

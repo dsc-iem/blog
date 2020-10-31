@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Followers - {% include "blocks/name.html" %}{% endblock %}
+{% block content %}
+<div class="container">
+    {% if chaselist|length %}
+    <br />
+    <div class="ink-primary size-l base-regular">
+    Followers
+    </div>
+    <hr />
+    <div>
+        {% include "blocks/usersList.html" with items=chaselist  %}
+    </div>
+    {% else %}
+    <div class="ink-grey base-regular size-m center" style="min-height: 30rem;">
+        No followers yet
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

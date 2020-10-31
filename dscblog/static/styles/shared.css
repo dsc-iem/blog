@@ -34,6 +34,13 @@ body{
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.trunc-long{
+  width: 37rem;
+  max-width: 70vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @media(max-width:350){
   .trunc {
     max-width: 34vw;

@@ -26,13 +26,23 @@
 </div>
 {% endif %}    
 </div>
-
-<div class="markdown">
+<div class="hstack container author-info">
+    <div>
+        {% if blog.author.avatar_url %}
+        <a href="/@{{ blog.author.username }}">
+            <img class="icon author_avatar" src="{{ blog.author.avatar_url }}" />
+        </a>
+        {% endif %}
+    </div>
+    <div>
         <div onclick="openLink('/@{{blog.author.username}}')" 
-        class="size-s ink-secondary base-semilight blog-author clickable">
-            {{blog.author.username}}
+        class="size-s ink-secondary base-regular blog-author clickable">
+        {% include "blocks/name.html" with user=blog.author %}
         </div>
-    <div class="size-s base-light ink-grey">{{blog.modified_on}}</div>
+        <div class="size-xs base-light ink-grey">{{blog.modified_on}}</div> 
+    </div>
+</div>
+<div class="markdown">
     <div class="size-xxl ink-primary base-regular blog-title">{{blog.title}}</div>
     <br/>
     {% autoescape off %}
@@ -46,13 +56,25 @@
     <div class="react" id="cool">🆒<div class="react_count" id="cool_count">{{blog.reaction_counts.COL}}</div></div>
     <div class="react" id="clap">👏<div class="react_count" id="clap_count">{{blog.reaction_counts.CLP}}</div></div>
 </div>
+{% if is_owner %}
+    <div class="center">
+        <a class="ink-green size-xs base-regular" href="/blog/{{blog.blog_id}}/reactions">View reactions</a>
+    </div>
+    <br/>
+    {% endif %}
 <br/>
-<div class="center">
+<div class="center-col">
     <a href="/blog/{{blog.blog_id}}/comments" id="comments_button" class="size-s base-regular ink-blue" >
         {{blog.comments_count}} Comments
     </a>
 </div>
 <br />
+<br />
+<div class="container" id="more">
+        <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
+    <hr/>
+    {% include "blocks/blogsGrid.html" with items=more_blogs is_owner=False  %}
+</div>
 <br />
 <script>
     const REACTS={
@@ -102,7 +124,7 @@
             } else if (scode == 400) {
                 alert(res.msg);
             } else if (scode == 401) {
-                window.location.href = "/accounts/login?next="+window.location.href
+                window.location.href = "/accounts/login?next="+window.location.pathname
             }
         })
     }
