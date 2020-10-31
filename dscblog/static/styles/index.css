@@ -17,7 +17,7 @@ padding-top: 2rem;
 }
 .ft_intro{
     padding: 1.2rem 0.5rem;
-    margin-left: 0.5rem;
+    margin-left: 0rem;
     max-width: 40rem;
 }
 .ft_img{
@@ -43,6 +43,9 @@ padding-top: 2rem;
     .ft_cover{
         max-height: 60vh;
         min-height: 18rem;
+    }
+    .ft_intro{
+        padding-left: 0px;
     }
 }
 #header{
