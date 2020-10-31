@@ -52,13 +52,15 @@ def top25(request):
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
 
-def followers(request,username):
+
+def followers(request, username):
     try:
         user = User.get_by_username(username)
     except:
         return page404(request)
     else:
-        data = {'header':{'is_loggedin':True},'user':user.get_profile_min(),'chaselist':[]}
+        data = {'header': {'is_loggedin': True},
+                'user': user.get_profile_min(), 'chaselist': []}
         chaselist = user.get_followers()
         for follower in chaselist:
             data['chaselist'].append(follower.user.get_profile_min())
@@ -109,7 +111,7 @@ def blog(request, slug, id):
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': md.reset().convert(b.content),
-                    'more_blogs':[],
+                    'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 blogs = Blog.recent4()
                 for b in blogs:
