@@ -31,7 +31,7 @@ urlpatterns = [
     path('blog/<int:blog_id>/comments', paths.blog_comments),
     path('create', paths.create, name='create'),
     path('profile', paths.my_profile),
-    path('followers', paths.followers, name='followers'),
+    path('@<str:username>/followers', paths.followers),
     path('userSettings', paths.user_settings),
     path('blog/<int:id>/settings', paths.blog_settings, name='blog_settings'),
     path('blog/<int:id>/edit', paths.blog_edit),

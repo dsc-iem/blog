@@ -1,0 +1,19 @@
+.ul_txt{
+    align-items: flex-start;
+}
+.ul_item{
+    padding: 0.65rem 0.5rem;
+    border-bottom: solid 1px rgb(228, 228, 228);
+}
+.ul_avatar{
+    font-size: 2rem;
+    margin: 0.3rem;
+    margin-right: 1.1rem;
+    border-radius: 50%;
+}
+[data-theme="dark"] .ul_item{
+    border-bottom: solid 1px rgb(51, 51, 51);
+}
+.ul_item:nth-last-of-type(1){
+    border-bottom: none;
+}

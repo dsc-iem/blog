@@ -26,13 +26,23 @@
 </div>
 {% endif %}    
 </div>
-
-<div class="markdown">
+<div class="hstack container author-info">
+    <div>
+        {% if blog.author.avatar_url %}
+        <a href="/@{{ blog.author.username }}">
+            <img class="icon author_avatar" src="{{ blog.author.avatar_url }}" />
+        </a>
+        {% endif %}
+    </div>
+    <div>
         <div onclick="openLink('/@{{blog.author.username}}')" 
-        class="size-s ink-secondary base-semilight blog-author clickable">
-            {{blog.author.username}}
+        class="size-s ink-secondary base-regular blog-author clickable">
+        {% include "blocks/name.html" with user=blog.author %}
         </div>
-    <div class="size-s base-light ink-grey">{{blog.modified_on}}</div>
+        <div class="size-s base-light ink-grey">{{blog.modified_on}}</div> 
+    </div>
+</div>
+<div class="markdown">
     <div class="size-xxl ink-primary base-regular blog-title">{{blog.title}}</div>
     <br/>
     {% autoescape off %}

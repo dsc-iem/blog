@@ -1,12 +1,24 @@
 .blog-title{
     padding: 0.5rem 0px;
 }
+.author-info{
+    width:35em;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: 2rem;
+}
 .blog-author{
     width: fit-content;
     display: block;
     padding-left: 0rem;
     text-decoration: none;
     margin-bottom: 0.2rem;
+}
+.author_avatar{
+    font-size: 2.6rem;
+    margin: 0.3rem;
+    margin-right: 1rem;
+    border-radius: 50%;
 }
 .blog-author:hover{
     color: var(--primary);

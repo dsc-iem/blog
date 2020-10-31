@@ -9,7 +9,6 @@ import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
 
-from .followers import return_follower_username
 
 md = markdown.Markdown(
     extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
@@ -54,11 +53,17 @@ def my_profile(request):
     return redirect(to='/@'+request.user.username)
 
 @login_required
-def followers(request):
-    data = {'header':{'is_loggedin':True}}
-    chaselist = request.user.get_followers() 
-    data['chaselist'] = return_follower_username(chaselist)
-    return render(request, 'blocks/usersList.html', data)
+def followers(request,username):
+    try:
+        user = User.get_by_username(username)
+    except:
+        return page404(request)
+    else:
+        data = {'header':{'is_loggedin':True},'user':user.get_profile_min(),'chaselist':[]}
+        chaselist = user.get_followers()
+        for follower in chaselist:
+            data['chaselist'].append(follower.user.get_profile_min())
+        return render(request, 'followers.html', data)
 
 
 @login_required
