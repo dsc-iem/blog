@@ -56,8 +56,14 @@
     <div class="react" id="cool">🆒<div class="react_count" id="cool_count">{{blog.reaction_counts.COL}}</div></div>
     <div class="react" id="clap">👏<div class="react_count" id="clap_count">{{blog.reaction_counts.CLP}}</div></div>
 </div>
+{% if is_owner %}
+    <div class="center">
+        <a class="ink-green size-xs base-regular" href="/blog/{{blog.blog_id}}/reactions">View reactions</a>
+    </div>
+    <br/>
+    {% endif %}
 <br/>
-<div class="center">
+<div class="center-col">
     <a href="/blog/{{blog.blog_id}}/comments" id="comments_button" class="size-s base-regular ink-blue" >
         {{blog.comments_count}} Comments
     </a>

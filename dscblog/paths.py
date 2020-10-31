@@ -68,6 +68,26 @@ def followers(request, username):
 
 
 @login_required
+def blog_reactions(request, id):
+    try:
+        b = Blog.get_by_id(id)
+    except:
+        return page404(request)
+    else:
+        if request.user == b.author:
+            data = {'header': {'is_loggedin': True},
+                    'users': [],'blog':b.get_obj_min()}
+            reactions = b.get_reactions()
+            for reaction in reactions:
+                obj=reaction.user.get_profile_min()
+                obj['reaction']=reaction.reaction
+                data['users'].append(obj)
+            return render(request, 'reactions.html', data)
+        else:
+            return page404(request)
+
+
+@login_required
 def user_settings(request):
     if request.method == 'POST':
         form = UserSettingsForm(request.POST, instance=request.user)

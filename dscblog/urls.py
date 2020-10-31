@@ -35,6 +35,7 @@ urlpatterns = [
     path('userSettings', paths.user_settings),
     path('blog/<int:id>/settings', paths.blog_settings, name='blog_settings'),
     path('blog/<int:id>/edit', paths.blog_edit),
+    path('blog/<int:id>/reactions', paths.blog_reactions),
     path('@<str:username>', paths.profile),
     path('accounts/', include('allauth.urls')),
     re_path(r'^favicon\.ico$', favicon_view),

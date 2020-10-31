@@ -3,6 +3,21 @@
 <div class="users_list">
     {% for user in items %}
     <div class="hstack ul_item" >
+            {% if user.reaction %}
+                <div class="ul_react">
+                    {% if user.reaction == 'LIK' %}
+                    👍
+                    {% elif user.reaction == 'LOV' %}
+                    ❤
+                    {% elif user.reaction == 'LIT' %}
+                    🔥
+                    {% elif user.reaction == 'COL' %}
+                    🆒
+                    {% elif user.reaction == 'CLP' %}
+                    👏
+                    {% endif %}
+                </div>
+            {% endif %}
             {% if user.avatar_url %}
             <a href="/@{{ user.username }}">
                 <img class="icon ul_avatar" src="{{ user.avatar_url }}" />

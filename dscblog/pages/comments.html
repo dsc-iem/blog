@@ -14,13 +14,15 @@ Comments - {{blog.title}} - DSC IEM Blogs
             {% if item.user.avatar_url %}
             <a href="/@{{item.user.username}}" class="comm_img" style="background-image: url('{{item.user.avatar_url}}');"></a>
             {% endif %}
-            <a href="/@{{item.user.username}}" class="comm_username size-xs base-regular ink-primary">{{item.user.username}}</a>
+            <a href="/@{{item.user.username}}" class="comm_username size-xs base-regular ink-primary">
+                {% include "blocks/name.html" with user=item.user %}
+            </a>
         </div>
         {% if item.reference != None %}
         <div class="comm_ref" onclick="foc('{{item.reference.comment_id}}')">
             <div class="comm_head">
                 <a href="/@{{item.reference.user.username}}" class="comm_username size-xs base-regular ink-primary">
-                    {{item.reference.user.username}}
+                    {% include "blocks/name.html" with user=item.reference.user %}
                 </a>
             </div>
             <div class="comm_text">{{item.reference.text}}</div>

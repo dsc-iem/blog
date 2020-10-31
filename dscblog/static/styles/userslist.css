@@ -17,3 +17,14 @@
 .ul_item:nth-last-of-type(1){
     border-bottom: none;
 }
+.ul_react{
+    font-size: 1.2rem;
+    margin: 0.3rem;
+    margin-right: 0.8rem;
+    border-radius: 0.5rem;
+    padding: 0.6rem;
+    background-color: rgb(187, 228, 255);
+}
+[data-theme="dark"] .ul_react{
+    background-color: rgb(11, 45, 61);
+}

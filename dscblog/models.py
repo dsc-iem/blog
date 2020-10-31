@@ -242,6 +242,11 @@ class Blog(models.Model):
                 blog=self, reaction=react).count()
         return counts
 
+    def get_reactions(self):
+        reacts = Reaction.objects.filter(
+                blog=self).order_by('-date')
+        return reacts
+
     def get_user_reaction(self, user):
         try:
             react = Reaction.objects.get(user=user, blog=self)
