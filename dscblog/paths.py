@@ -52,7 +52,6 @@ def top25(request):
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
 
-@login_required
 def followers(request,username):
     try:
         user = User.get_by_username(username)
