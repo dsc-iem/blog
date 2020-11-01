@@ -1,7 +1,14 @@
 {% if items %}
 <div class="blogs_grid">
     {% for item in items %}
-    <div class="blog_item" onclick="openLink('{{item.blog_url}}')" style="background-image: url({{item.img_url}});">
+    <div class="vstack" style="text-align: left;">
+      {% if item.highlight %}
+      <div class="bi_hl hstack">
+          <img src="/static/icons/{{item.highlight.type}}.png" class="icon bi_hlIcon">
+          <div class="ink-grey">{{item.highlight.text}}</div>
+        </div>
+      {% endif %}
+      <div class="blog_item" onclick="openLink('{{item.blog_url}}')" style="background-image: url({{item.img_url}});">
             <div class="bi_cover"></div>
             <div class="bi_txt">
                 <div class="bi_info">
@@ -30,7 +37,9 @@
                     <!-- put likes and comments here -->
                 </div>
             </div>
-        </div>
+        </div>  
+    </div>
+    
     {% endfor %}
 </div>
 {% endif %}

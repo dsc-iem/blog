@@ -17,12 +17,12 @@ md = markdown.Markdown(
 def index(request):
     opts = {'header': {
         'is_loggedin': False, 'is_empty': False}}
+    opts['blogs'] = []
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
-    opts['blogs'] = []
-    blogs = Blog.top25()
-    for b in blogs:
-        opts['blogs'].append(b.get_obj_min())
+        opts['blogs'] = User.get_feed(request.user)
+    else:
+        opts['blogs'] = User.get_feed()
     try:
         featured = Featured.pickOne().blog
     except Exception as e:
