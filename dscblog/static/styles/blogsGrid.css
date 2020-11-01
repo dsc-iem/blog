@@ -3,7 +3,24 @@
   grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
   grid-column-gap: 0.5px;
 }
-
+.bi_hl{
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.2rem 0.4rem;
+    padding-top: 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    align-self: flex-start;
+    margin: 0px auto;
+    width: 28rem;
+    max-width: 90vw;
+}
+.bi_hlIcon{
+    font-size: 1rem;
+    margin: 0.2rem 0.4rem;
+    margin-right: 0.6rem;
+    margin-bottom: 0px;
+}
 .blog_item {
   height: 15rem;
   width: 28rem;

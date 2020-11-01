@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Avg, Count, Min, Sum
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 import datetime
@@ -7,6 +7,8 @@ from django.utils import timezone
 from dscblog.common import makecode, dump_datetime
 from django.utils.text import slugify
 import html
+import datetime
+import random
 
 
 class UserManager(BaseUserManager):
@@ -56,6 +58,9 @@ class User(AbstractUser):
 
     def get_profile_min(self):
         return {'user_id': self.id, 'username': self.username, 'name': self.name, 'avatar_url': self.avatar_url}
+
+    def get_name(self):
+        return self.name or self.username
 
     def get_profile(self, user=None):
         obj = self.get_profile_min()
@@ -158,6 +163,99 @@ class User(AbstractUser):
         else:
             return obj
 
+    def get_author_feed(self):
+        return Blog.objects.filter(is_published=True, published_on__gte=timezone.now()-datetime.timedelta(days=3), author__followers__user=self).order_by('-modified_on', '-published_on')
+
+    def get_likes_feed(self, limit=100):
+        q = Reaction.objects.filter(blog__is_published=True, date__gte=timezone.now(
+        )-datetime.timedelta(days=1, hours=6), user__followers__user=self).order_by('-date')
+        likes_feed = []
+        for reaction in q:
+            new = True
+            for existing in likes_feed:
+                if existing['blog'] == reaction.blog:
+                    if reaction.user not in existing['users']:
+                        existing['users'].append(reaction.user)
+                    new = False
+                    break
+            if new:
+                likes_feed.append(
+                    {'blog': reaction.blog, 'users': [reaction.user]})
+            if len(likes_feed) >= limit:
+                break
+        return likes_feed
+
+    def get_comments_feed(self, limit=100):
+        q = Comment.objects.filter(blog__is_published=True, date__gte=timezone.now(
+        )-datetime.timedelta(days=2), user__followers__user=self).order_by('-date')
+        comments_feed = []
+        for comment in q:
+            new = True
+            for existing in comments_feed:
+                if existing['blog'] == comment.blog:
+                    if comment.user not in existing['users']:
+                        existing['users'].append(comment.user)
+                    new = False
+                    break
+            if new:
+                comments_feed.append(
+                    {'blog': comment.blog, 'users': [comment.user]})
+            if len(comments_feed) >= limit:
+                break
+        return comments_feed
+
+    @classmethod
+    def get_feed(cls,usr=None):
+        posts = []
+        if usr!=None:
+            author_feed = usr.get_author_feed()[:5]
+            for post in author_feed:
+                obj = post.get_obj_min()
+                obj['highlight'] = {'type': 'NEW',
+                                    'text': 'New post from '+post.author.get_name()}
+                posts.append(obj)
+            comments_feed = usr.get_comments_feed(5)
+            for comment in comments_feed:
+                obj = comment['blog'].get_obj_min()
+                txt = ''
+                for ind, user in enumerate(comment['users']):
+                    txt += user.get_name()
+                    if ind != len(comment['users'])-1:
+                        txt += ', '
+                obj['highlight'] = {'type': 'COMMENT',
+                                    'text': txt+' commented'}
+                posts.append(obj)
+            likes_feed = usr.get_likes_feed(5)
+            for reaction in likes_feed:
+                obj = reaction['blog'].get_obj_min()
+                txt = ''
+                for ind, user in enumerate(comment['users']):
+                    txt += user.get_name()
+                    if ind != len(comment['users'])-1:
+                        txt += ', '
+                obj['highlight'] = {'type': 'LIKE',
+                                    'text': txt+' liked'}
+                posts.append(obj)
+        if len(posts) >= 15:
+            trending_feed = Blog.trending()[:5]
+        else:
+            trending_feed = Blog.trending()[:10]
+        for post in trending_feed:
+            obj = post.get_obj_min()
+            obj['highlight'] = {'type': 'TRENDING', 'text': 'Trending'}
+            posts.append(obj)
+        if len(posts) < 25:
+            if len(posts) <= 10:
+                recents_feed = Blog.recents()[:10]
+            else:
+                recents_feed = Blog.recents()[:5]
+            for post in recents_feed:
+                obj = post.get_obj_min()
+                obj['highlight'] = {'type': 'NEW', 'text': 'Recently added'}
+                posts.append(obj)
+        random.shuffle(posts)
+        return posts
+
     @classmethod
     def get_by_id(cls, pk):
         return cls.objects.get(id=pk)
@@ -209,6 +307,17 @@ class Blog(models.Model):
     modified_on = models.DateTimeField()
     published_on = models.DateTimeField(null=True, default=None)
     is_published = models.BooleanField(default=False)
+    score = models.FloatField(verbose_name='Engagement Score', default=0.0)
+
+    def addScore(self, amt):
+        self.score = self.score+amt
+        self.save()
+        return self.score
+
+    def reduceScore(self, amt):
+        self.score = self.score-amt
+        self.save()
+        return self.score
 
     def get_obj_min(self):
         obj = {'title': self.title, 'img_url': self.img_url, 'blog_id': self.id, 'blog_url': self.get_url(),
@@ -244,7 +353,7 @@ class Blog(models.Model):
 
     def get_reactions(self):
         reacts = Reaction.objects.filter(
-                blog=self).order_by('-date')
+            blog=self).order_by('-date')
         return reacts
 
     def get_user_reaction(self, user):
@@ -305,18 +414,28 @@ class Blog(models.Model):
         return cls.objects.get(id=pk)
 
     @classmethod
+    def trending(cls):
+        return cls.objects.filter(is_published=True,
+                                  published_on__gte=timezone.now()-datetime.timedelta(days=3)).order_by('-score', '-published_on')
+
+    @classmethod
     def top25(cls):
-        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:25]
+        return cls.objects.filter(is_published=True).order_by('-score', '-published_on')[:25]
 
     @classmethod
     def recent4(cls):
         return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:4]
+
+    @classmethod
+    def recents(cls):
+        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')
 
     def __str__(self):
         return str(self.id)+'. '+self.title
 
 
 class Reaction(models.Model):
+    SCORE = 0.3
     LIKE = 'LIK'
     LOVE = 'LOV'
     LIT = 'LIT'
@@ -345,6 +464,7 @@ class Reaction(models.Model):
         unique_together = ['user', 'blog']
 
     def unreact(self):
+        self.blog.reduceScore(Reaction.SCORE)
         self.delete()
 
     def get_obj(self):
@@ -363,6 +483,7 @@ class Reaction(models.Model):
             obj = cls(user=user, blog=blog,
                       reaction=reaction, date=timezone.now())
             obj.save()
+            blog.addScore(cls.SCORE)
             return obj
         else:
             existing.reaction = reaction
@@ -406,6 +527,17 @@ class Comment(models.Model):
         obj = cls(user=user, blog=blog,
                   text=text, date=timezone.now(), reference=reference)
         obj.save()
+        if user != blog.author:
+            if reference:
+                blog.addScore(0.4)
+            else:
+                # First comment of the user
+                if user.commented.filter(blog=blog).count() <= 1:
+                    blog.addScore(0.5)
+                else:
+                    blog.addScore(0.3)
+        else:
+            blog.addScore(0.1)
         return obj
 
     @classmethod
