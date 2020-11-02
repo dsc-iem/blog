@@ -424,7 +424,7 @@ class Blog(models.Model):
                     timezone.now(
                     )-F('views__date'), output_field=models.IntegerField()
                 ))).filter(is_published=True,
-                           engagement_recency__lte=3*24*60*60, score__gte=MIN_TRENDING_SCORE).order_by('-engagement_recency', '-score')
+                            score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
 
     @classmethod
     def by_recent_engagement(cls):
@@ -433,7 +433,7 @@ class Blog(models.Model):
                 ExpressionWrapper(
                     timezone.now(
                     )-F('views__date'), output_field=models.IntegerField()
-                ))).filter(is_published=True).order_by('-engagement_recency', '-score')
+                ))).filter(is_published=True).order_by('engagement_recency', '-score')
 
     @classmethod
     def top25(cls):
