@@ -52,6 +52,7 @@ urlpatterns = [
     path('api/blog/unreact', paths.blog_unreact),
     path('api/blog/comment', paths.blog_comment),
     path('api/blog/uncomment', paths.blog_uncomment),
+    path('api/blog/pingback', paths.pingback),
 ]
 
 handler404 = 'dscblog.paths.page404'

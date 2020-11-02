@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
-from dscblog.models import User, Blog, Featured, Reaction, Comment
+from dscblog.models import User, Blog, Featured, Reaction, Comment, View
 from dscblog.forms import UserSettingsForm
 import markdown
 import html
@@ -14,7 +14,14 @@ md = markdown.Markdown(
     extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
 
 
+def convert_session_to_user(request):
+    if request.user.is_authenticated:
+        if request.session.get('has_views', False):
+            View.convert_to_user(request.session, request.user)
+
+
 def index(request):
+    convert_session_to_user(request)
     opts = {'header': {
         'is_loggedin': False, 'is_empty': False}}
     opts['blogs'] = []
@@ -36,6 +43,7 @@ def index(request):
 
 
 def top25(request):
+    convert_session_to_user(request)
     opts = {'header': {
         'is_loggedin': False, 'is_empty': False}}
     if request.user.is_authenticated:
@@ -69,6 +77,7 @@ def followers(request, username):
 
 @login_required
 def blog_reactions(request, id):
+    convert_session_to_user(request)
     try:
         b = Blog.get_by_id(id)
     except:
@@ -76,11 +85,11 @@ def blog_reactions(request, id):
     else:
         if request.user == b.author:
             data = {'header': {'is_loggedin': True},
-                    'users': [],'blog':b.get_obj_min()}
+                    'users': [], 'blog': b.get_obj_min()}
             reactions = b.get_reactions()
             for reaction in reactions:
-                obj=reaction.user.get_profile_min()
-                obj['reaction']=reaction.reaction
+                obj = reaction.user.get_profile_min()
+                obj['reaction'] = reaction.reaction
                 data['users'].append(obj)
             return render(request, 'reactions.html', data)
         else:
@@ -103,6 +112,7 @@ def user_settings(request):
 
 
 def profile(request, username):
+    convert_session_to_user(request)
     opts = {'header': {
         'is_loggedin': False, 'is_empty': False},
         'is_owner': request.user.is_authenticated and request.user.username == username}
@@ -120,6 +130,7 @@ def profile(request, username):
 
 
 def blog(request, slug, id):
+    convert_session_to_user(request)
     try:
         b = Blog.get_by_id(id)
     except:
@@ -134,10 +145,15 @@ def blog(request, slug, id):
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 blogs = Blog.recent4()
-                for b in blogs:
-                    opts['more_blogs'].append(b.get_obj_min())
+                for blog in blogs:
+                    opts['more_blogs'].append(blog.get_obj_min())
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
+                    view_key = View.create(user=request.user, blog=b)
+                else:
+                    view_key = View.create(
+                        user=None, blog=b, session=request.session)
+                opts['view_key'] = view_key
                 res = render(request, 'blog.html', opts)
                 return res
             else:
@@ -147,6 +163,7 @@ def blog(request, slug, id):
 
 
 def blog_comments(request, blog_id):
+    convert_session_to_user(request)
     try:
         b = Blog.get_by_id(blog_id)
     except:
@@ -213,6 +230,20 @@ def blog_edit(request, id):
             return render(request, 'blogEditor.html', opts)
         else:
             return page404(request)
+
+
+@require_http_methods(["POST"])
+def pingback(request):
+    if 'view_key' in request.POST:
+        try:
+            view = View.get_by_key(request.POST['view_key'])
+        except:
+            return apiRespond(400, msg='View not found')
+        else:
+            pingbacks = view.pingback()
+            return apiRespond(201, pingbacks=pingbacks)
+    else:
+        return apiRespond(400, msg='Pingback: Required fields missing')
 
 
 @require_http_methods(["POST"])

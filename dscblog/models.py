@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import Q, Avg, Count, Min, Sum
+from django.db.models import Q, F, Avg, Count, Min, Sum, ExpressionWrapper
+from django.contrib.sessions.models import Session
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 import datetime
@@ -9,6 +10,8 @@ from django.utils.text import slugify
 import html
 import datetime
 import random
+
+MIN_TRENDING_SCORE = 5
 
 
 class UserManager(BaseUserManager):
@@ -205,9 +208,9 @@ class User(AbstractUser):
         return comments_feed
 
     @classmethod
-    def get_feed(cls,usr=None):
+    def get_feed(cls, usr=None):
         posts = []
-        if usr!=None:
+        if usr != None:
             author_feed = usr.get_author_feed()[:5]
             for post in author_feed:
                 obj = post.get_obj_min()
@@ -415,8 +418,22 @@ class Blog(models.Model):
 
     @classmethod
     def trending(cls):
-        return cls.objects.filter(is_published=True,
-                                  published_on__gte=timezone.now()-datetime.timedelta(days=3)).order_by('-score', '-published_on')
+        return cls.objects.annotate(
+            engagement_recency=Avg(
+                ExpressionWrapper(
+                    timezone.now(
+                    )-F('views__date'), output_field=models.IntegerField()
+                ))).filter(is_published=True,
+                           engagement_recency__lte=3*24*60*60, score__gte=MIN_TRENDING_SCORE).order_by('-engagement_recency', '-score')
+
+    @classmethod
+    def by_recent_engagement(cls):
+        return cls.objects.annotate(
+            engagement_recency=Avg(
+                ExpressionWrapper(
+                    timezone.now(
+                    )-F('views__date'), output_field=models.IntegerField()
+                ))).filter(is_published=True).order_by('-engagement_recency', '-score')
 
     @classmethod
     def top25(cls):
@@ -432,6 +449,95 @@ class Blog(models.Model):
 
     def __str__(self):
         return str(self.id)+'. '+self.title
+
+
+class View(models.Model):
+    user = models.ForeignKey(
+        User, related_name="viewed", on_delete=models.SET_NULL, null=True, default=None)
+    session = models.ForeignKey(
+        Session, related_name="viewed",  on_delete=models.SET_NULL, null=True, default=None)
+    blog = models.ForeignKey(
+        Blog, related_name="views", on_delete=models.CASCADE)
+    score = models.FloatField(verbose_name='Engagement Score', default=1.0)
+    date = models.DateTimeField()
+    key = models.CharField(max_length=30, verbose_name='Key')
+    pingbacks = models.IntegerField(default=0)
+    last_pingback_date = models.DateTimeField(null=True, default=None)
+
+    def delete(self):
+        self.delete()
+
+    def addScore(self, amt):
+        self.score = self.score+amt
+        self.save()
+        return self.score
+
+    def reduceScore(self, amt):
+        self.score = self.score-amt
+        self.save()
+        return self.score
+
+    def pingback(self):
+        time_diff = timezone.now()-self.last_pingback_date
+        if self.pingbacks <= 30 and time_diff >= datetime.timedelta(seconds=20) and time_diff <= datetime.timedelta(minutes=2):
+            self.pingbacks += 1
+            self.score += 0.07
+            self.blog.addScore(0.07)
+            self.last_pingback_date = timezone.now()
+            self.save()
+        return self.pingbacks
+
+    @classmethod
+    def create(cls, user, blog, session=None):
+        if session != None:
+            session['has_views'] = True
+        try:
+            existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
+            )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
+        except:
+            score = 0.1
+            prev = cls.objects.filter(user=user, blog=blog, session=session)
+            prev_count = prev.count()
+            if prev_count == 0:
+                score = 0.5
+            elif prev_count <= 5:
+                score = 0.3
+            else:
+                score = 0.1
+            blog.addScore(score)
+            obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
+                      last_pingback_date=timezone.now(), score=score, key=makecode())
+            obj.save()
+            return obj.key
+        else:
+            existing.last_pingback_date = timezone.now()
+            existing.save()
+            return existing.key
+
+    @classmethod
+    def get_active(cls, user, blog, session=None):
+        return cls.objects.filter(user=user, blog=blog, session=session,
+                                  last_pingback_date__gte=timezone.now()-datetime.timedelta(hours=1)).order_by('-last_pingback_date')[0]
+
+    @classmethod
+    def add_score(cls, user, blog, val=0.1, session=None):
+        try:
+            view = cls.get_active(user, blog, session)
+        except:
+            return False
+        else:
+            view.add_score(val)
+            return True
+
+    @classmethod
+    def convert_to_user(cls, session, user):
+        cls.objects.filter(user=None, session=session).update(
+            user=user, session=None)
+        session['has_views'] = False
+
+    @classmethod
+    def get_by_key(cls, key):
+        return cls.objects.get(key=key, last_pingback_date__gte=timezone.now()-datetime.timedelta(hours=1))
 
 
 class Reaction(models.Model):
@@ -484,6 +590,7 @@ class Reaction(models.Model):
                       reaction=reaction, date=timezone.now())
             obj.save()
             blog.addScore(cls.SCORE)
+            View.addScore(user, blog, cls.SCORE)
             return obj
         else:
             existing.reaction = reaction
@@ -530,12 +637,15 @@ class Comment(models.Model):
         if user != blog.author:
             if reference:
                 blog.addScore(0.4)
+                View.addScore(user, blog, 0.4)
             else:
                 # First comment of the user
                 if user.commented.filter(blog=blog).count() <= 1:
                     blog.addScore(0.5)
+                    View.addScore(user, blog, 0.5)
                 else:
                     blog.addScore(0.3)
+                    View.addScore(user, blog, 0.3)
         else:
             blog.addScore(0.1)
         return obj
