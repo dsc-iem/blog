@@ -430,8 +430,8 @@ class Blog(models.Model):
         else:
             return cls.objects.annotate(
                 engagement_recency=Avg(
-                        timezone.now(
-                        )-F('views__date')
+                        ExpressionWrapper(timezone.now(
+                        )-F('views__date'),output_field=models.DurationField())
                     )).filter(is_published=True,
                                engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
 
