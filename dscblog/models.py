@@ -6,6 +6,7 @@ from django.contrib.auth.base_user import BaseUserManager
 import datetime
 from django.utils import timezone
 from dscblog.common import makecode, dump_datetime
+from dscblog.settings import DATABASES
 from django.utils.text import slugify
 import html
 import datetime
@@ -418,13 +419,22 @@ class Blog(models.Model):
 
     @classmethod
     def trending(cls):
-        return cls.objects.annotate(
-            engagement_recency=Avg(
-                ExpressionWrapper(
-                    timezone.now(
-                    )-F('views__date'), output_field=models.IntegerField()
-                ))).filter(is_published=True,
-                            score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+        if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+            return cls.objects.annotate(
+                engagement_recency=Avg(
+                    ExpressionWrapper(
+                        timezone.now(
+                        )-F('views__date'), output_field=models.IntegerField()
+                    ))).filter(is_published=True,
+                               engagement_recency__lte=3*24*60*60, score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+        else:
+            return cls.objects.annotate(
+                engagement_recency=Avg(
+                    ExpressionWrapper(
+                        timezone.now(
+                        )-F('views__date'), output_field=models.IntegerField()
+                    ))).filter(is_published=True,
+                               engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
 
     @classmethod
     def by_recent_engagement(cls):
