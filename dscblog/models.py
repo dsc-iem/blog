@@ -15,6 +15,10 @@ import random
 MIN_TRENDING_SCORE = 5
 
 
+def get_top_topics_of_session(session):
+    return Topic.objects.annotate(score=Sum('blogs__views__score', filter=Q(blogs__views__session=session)), views_count=Count('blogs__views', filter=Q(blogs__views__session=session))).order_by('-score', '-views_count', '-created_on')
+
+
 class UserManager(BaseUserManager):
     """
     Custom user model manager
@@ -167,6 +171,9 @@ class User(AbstractUser):
         else:
             return obj
 
+    def get_top_topics(self):
+        return Topic.objects.annotate(score=Sum('blogs__views__score', filter=Q(blogs__views__user=self)), views_count=Count('blogs__views', filter=Q(blogs__views__user=self))).order_by('-score', '-views_count', '-created_on')
+
     def get_author_feed(self):
         return Blog.objects.filter(is_published=True, published_on__gte=timezone.now()-datetime.timedelta(days=3), author__followers__user=self).order_by('-modified_on', '-published_on')
 
@@ -209,7 +216,44 @@ class User(AbstractUser):
         return comments_feed
 
     @classmethod
-    def get_feed(cls, usr=None):
+    def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None):
+        top_topics = init_topics
+        posts = []
+        blogs = []
+        if user != None:
+            for topic in user.get_top_topics()[:7]:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+        elif session != None:
+            for topic in get_top_topics_of_session(session)[:7]:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+        if len(top_topics) < 7:
+            hot_topics = Topic.top_topics()
+            for topic in hot_topics:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+                if len(top_topics) >= 9:
+                    break
+        random.shuffle(top_topics)
+        for topic in top_topics:
+            counter = 0
+            for blog in topic.top_blogs():
+                if blog not in blogs and blog != xcept:
+                    counter += 1
+                    blogs.append(blog)
+                    obj = blog.get_obj_min()
+                    obj['highlight'] = {'type': 'TOPIC',
+                                        'text': topic.name}
+                    posts.append(obj)
+                if counter >= 3:
+                    break
+            if len(posts) >= 12:
+                break
+        return posts
+
+    @classmethod
+    def get_feed(cls, usr=None, session=None):
         posts = []
         if usr != None:
             author_feed = usr.get_author_feed()[:5]
@@ -248,6 +292,9 @@ class User(AbstractUser):
             obj = post.get_obj_min()
             obj['highlight'] = {'type': 'TRENDING', 'text': 'Trending'}
             posts.append(obj)
+        psts = cls.feed_from_top_topics(usr, session)
+        for post in psts:
+            posts.append(post)
         if len(posts) < 25:
             if len(posts) <= 10:
                 recents_feed = Blog.recents()[:10]
@@ -427,6 +474,12 @@ class Blog(models.Model):
     def remove_topic(self, name):
         return Topic.untag(self, name)
 
+    def related_blogs(self, user=None, session=None):
+        topics = []
+        for topic in self.get_topics():
+            topics.append(topic)
+        return User.feed_from_top_topics(user, session, topics, self)[:6]
+
     @classmethod
     def create(cls, author, title):
         obj = cls(author=author, title=title, created_on=timezone.now(),
@@ -488,6 +541,17 @@ class Topic(models.Model):
 
     def remove(self):
         self.delete()
+
+    def top_blogs(self):
+        return self.blogs.filter(is_published=True).annotate(
+            engagement_recency=Avg(
+                ExpressionWrapper(
+                    timezone.now(
+                    )-F('views__date'), output_field=models.IntegerField()
+                ))).order_by('engagement_recency', '-score', '-published_on')
+
+    def recent_blogs(self):
+        return self.blogs.filter(is_published=True).order_by('-modified_on', '-published_on')
 
     @classmethod
     def get_by_name(cls, name):

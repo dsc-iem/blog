@@ -154,16 +154,15 @@ def blog(request, slug, id):
                     'html': md.reset().convert(b.content),
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
-                blogs = Blog.recent4()
-                for blog in blogs:
-                    opts['more_blogs'].append(blog.get_obj_min())
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                     view_key = View.create(user=request.user, blog=b)
+                    opts['more_blogs']=b.related_blogs(user=request.user)
                 else:
                     request.session['has_views'] = True
                     view_key = View.create(
                         user=None, blog=b, session=get_session(request))
+                    opts['more_blogs']=b.related_blogs(session=get_session(request))
                 opts['view_key'] = view_key
                 res = render(request, 'blog.html', opts)
                 return res
