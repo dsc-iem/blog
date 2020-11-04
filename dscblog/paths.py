@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
-from dscblog.models import User, Blog, Featured, Reaction, Comment, View
+from django.contrib.sessions.models import Session
+from dscblog.models import User, Blog, Featured, Reaction, Comment, View, Topic
 from dscblog.forms import UserSettingsForm
 import markdown
 import html
@@ -15,9 +16,18 @@ md = markdown.Markdown(
 
 
 def convert_session_to_user(request):
-    if request.user.is_authenticated:
+    session = get_session(request)
+    if request.user.is_authenticated and session != None:
         if request.session.get('has_views', False):
-            View.convert_to_user(request.session, request.user)
+            View.convert_to_user(session, request.user)
+            request.session['has_views'] = False
+
+
+def get_session(request):
+    try:
+        return Session.objects.get(session_key=request.session.session_key)
+    except:
+        return None
 
 
 def index(request):
@@ -151,8 +161,9 @@ def blog(request, slug, id):
                     opts['header']['is_loggedin'] = True
                     view_key = View.create(user=request.user, blog=b)
                 else:
+                    request.session['has_views'] = True
                     view_key = View.create(
-                        user=None, blog=b, session=request.session)
+                        user=None, blog=b, session=get_session(request))
                 opts['view_key'] = view_key
                 res = render(request, 'blog.html', opts)
                 return res
@@ -212,6 +223,10 @@ def blog_settings(request, id):
         if request.user == b.author:
             opts = {'header': {'is_loggedin': True, 'is_empty': False},
                     'blog': b.get_obj_min()}
+            topics = []
+            for topic in b.get_topics():
+                topics.append(topic.name)
+            opts['blog']['topics'] = to_json(topics)
             return render(request, 'blogSettings.html', opts)
         else:
             return page404(request)
@@ -374,6 +389,56 @@ def set_blog_title(request):
                         return apiRespond(201, title=title)
                     else:
                         return apiRespond(400, msg='Title too short')
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def add_blog_topic(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST and 'topic' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    topic = request.POST['topic'].strip().lower()
+                    if len(topic) > 1:
+                        if not b.has_topic(topic):
+                            b.add_topic(topic)
+                            return apiRespond(201, topic=topic)
+                        else:
+                            return apiRespond(400, msg='Topic already tagged')
+                    else:
+                        return apiRespond(400, msg='Topic name too short')
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def remove_blog_topic(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST and 'topic' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    topic = request.POST['topic'].strip().lower()
+                    if b.remove_topic(topic):
+                        return apiRespond(201, topic=topic)
+                    else:
+                        return apiRespond(400, msg='Could not remove the topic')
                 else:
                     return apiRespond(400, msg='Access denied')
         else:

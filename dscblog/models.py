@@ -312,6 +312,7 @@ class Blog(models.Model):
     published_on = models.DateTimeField(null=True, default=None)
     is_published = models.BooleanField(default=False)
     score = models.FloatField(verbose_name='Engagement Score', default=0.0)
+    topics = models.ManyToManyField('Topic', related_name="blogs")
 
     def addScore(self, amt):
         self.score = self.score+amt
@@ -322,6 +323,9 @@ class Blog(models.Model):
         self.score = self.score-amt
         self.save()
         return self.score
+
+    def get_topics(self):
+        return self.topics.all()
 
     def get_obj_min(self):
         obj = {'title': self.title, 'img_url': self.img_url, 'blog_id': self.id, 'blog_url': self.get_url(),
@@ -334,6 +338,9 @@ class Blog(models.Model):
         obj['reaction_counts'] = self.get_reaction_counts()
         obj['comments_count'] = self.get_comments_count()
         obj['user_reaction'] = None
+        obj['topics'] = []
+        for topic in self.get_topics():
+            obj['topics'].append(topic.name)
         if user != None:
             react_obj = self.get_user_reaction(user)
             if react_obj != None:
@@ -406,6 +413,20 @@ class Blog(models.Model):
             self.modified_on = timezone.now()
             self.save()
 
+    def has_topic(self, name):
+        try:
+            self.topics.get(name=name)
+        except:
+            return False
+        else:
+            return True
+
+    def add_topic(self, name):
+        return Topic.tag(self, name)
+
+    def remove_topic(self, name):
+        return Topic.untag(self, name)
+
     @classmethod
     def create(cls, author, title):
         obj = cls(author=author, title=title, created_on=timezone.now(),
@@ -430,10 +451,10 @@ class Blog(models.Model):
         else:
             return cls.objects.annotate(
                 engagement_recency=Avg(
-                        ExpressionWrapper(timezone.now(
-                        )-F('views__date'),output_field=models.DurationField())
-                    )).filter(is_published=True,
-                               engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+                    ExpressionWrapper(timezone.now(
+                    )-F('views__date'), output_field=models.DurationField())
+                )).filter(is_published=True,
+                          engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
 
     @classmethod
     def by_recent_engagement(cls):
@@ -460,6 +481,57 @@ class Blog(models.Model):
         return str(self.id)+'. '+self.title
 
 
+class Topic(models.Model):
+    name = models.CharField(
+        max_length=30, verbose_name='Name', primary_key=True)
+    created_on = models.DateTimeField()
+
+    def remove(self):
+        self.delete()
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.objects.get(name=name)
+
+    @classmethod
+    def tag(cls, blog, name):
+        try:
+            existing = cls.get_by_name(name=name)
+        except:
+            if len(name) <= 30:
+                topic = cls(name=name, created_on=timezone.now())
+                topic.save()
+                blog.topics.add(topic)
+                blog.save()
+                return topic
+            else:
+                return None
+        else:
+            blog.topics.add(existing)
+            blog.save()
+            return existing
+
+    @classmethod
+    def untag(cls, blog, name):
+        try:
+            topic = cls.get_by_name(name)
+        except:
+            return False
+        else:
+            if blog.has_topic(name):
+                blog.topics.remove(topic)
+                blog.save()
+                if topic.blogs.count() == 0:
+                    topic.remove()
+                return True
+            else:
+                return False
+
+    @classmethod
+    def top_topics(cls):
+        return cls.objects.annotate(score=Sum('blogs__score')).order_by('-score', '-created_on')
+
+
 class View(models.Model):
     user = models.ForeignKey(
         User, related_name="viewed", on_delete=models.SET_NULL, null=True, default=None)
@@ -473,7 +545,7 @@ class View(models.Model):
     pingbacks = models.IntegerField(default=0)
     last_pingback_date = models.DateTimeField(null=True, default=None)
 
-    def delete(self):
+    def remove(self):
         self.delete()
 
     def addScore(self, amt):
@@ -498,8 +570,6 @@ class View(models.Model):
 
     @classmethod
     def create(cls, user, blog, session=None):
-        if session != None:
-            session['has_views'] = True
         try:
             existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
             )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
@@ -542,7 +612,6 @@ class View(models.Model):
     def convert_to_user(cls, session, user):
         cls.objects.filter(user=None, session=session).update(
             user=user, session=None)
-        session['has_views'] = False
 
     @classmethod
     def get_by_key(cls, key):
@@ -622,7 +691,7 @@ class Comment(models.Model):
         'Comment', related_name="replies", null=True, default=None, on_delete=models.SET_NULL)
     date = models.DateTimeField()
 
-    def delete(self):
+    def remove(self):
         self.delete()
 
     def get_obj(self, user=None):

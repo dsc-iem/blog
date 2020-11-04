@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Blog settings{% endblock %}
+{% block title %}Blog settings - {{blog.title}}{% endblock %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/styles/blogSettings.css" />
 <div class="container">
@@ -14,16 +14,22 @@
     <div class="sec">
         <div class="vstack align-left">
             <div class="sec_title size-s ink-grey base-regular">Blog title</div>
-            <input id="titleBox" type="text" placeholder="Title" value="{{blog.title}}">
+            <input id="titleBox" autocomplete="off" type="text" placeholder="Title" value="{{blog.title}}">
         </div>
         <div id="titleSave" class="button rounded saveButton">Save</div>
     </div>
     <div class="sec">
         <div class="vstack align-left">
             <div class="sec_title size-s ink-grey base-regular">Image URL</div>
-            <input id="imgBox" type="text" placeholder="URL" value="{{blog.img_url}}">
+            <input id="imgBox "autocomplete="off" type="text" placeholder="URL" value="{{blog.img_url}}">
         </div>
         <div id="imgSave" class="button rounded saveButton">Save</div>
+    </div>
+    <div class="sec vstack align-left" id="topics_sec">
+            <div class="sec_title size-s ink-grey base-regular">Topics</div>
+            <div class="center" id="topics">
+                <div id="topic_add" onclick="addTopic()" class="center base-regular ink-white clickable">Add</div>
+            </div>
     </div>
     <div class="hstack space-between opt">
         <div class="ink-grey size-s base-regular">Public</div>
@@ -35,6 +41,18 @@
         <div id="delete" class="ink-red clickable">Delete blog</div>
     </div>
     <br/>
+</div>
+<div id="modal" class="center">
+    <div id="screen"></div>
+    <div id="modal_window" class="center-col">
+        <div class="center size-s ink-secondary base-regular" id="tm_title">Add topic</div>
+        <div class="center" style="padding:0.5rem">
+            <input id="topicBox" autocomplete="off" type="text" placeholder="Topic" value="">
+        </div>
+        <div id="topicSave" class="clickable">
+            <div class="ink-blue base-semilight size-s">Save</div>
+        </div>
+    </div>
 </div>
 <script>
     var toggle=toggleSwitch("toggle",(isActive)=>{
@@ -53,6 +71,9 @@
     var is_published = '{{blog.is_published}}'
     var title = '{{blog.title}}'
     var img_url = '{{blog.img_url}}'
+    {% autoescape off %}
+    var topics = JSON.parse('{{blog.topics}}')
+    {% endautoescape %}
     if (is_published == 'True')
         is_published = true;
     else
@@ -159,6 +180,85 @@
             $("#imgSave").css({
                 display: 'none'
             })
+        }
+    })
+    function renderTopics(){
+        var btn=$("#topic_add")
+        $("#topics").html('');
+        topics.forEach(topic => {
+            $("#topics").append(`<div class="topic ink-primary center"><div class="topic_txt">${topic}</div><div class="topic_remove clickable center" onclick="removeTopic('${topic}')" ></div></div>`)
+        });
+        $("#topics").append(btn)
+    }
+    renderTopics()
+    function removeTopic(topic){
+        console.log('removing topic',topic)
+        api.post('blog/untag', {
+            blog_id,topic
+        }, (code, res) => {
+            if (code == 201) {
+                topics.find((val,ind)=>{
+                    if(val==topic){
+                        topics.splice(ind,1)
+                        return true;
+                    }
+                    return false;
+                })
+                renderTopics()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+    }
+    function topicModal(show){
+        if(show){
+            $("#modal").css({
+                display: 'flex'
+            })
+        }
+        else{
+            $("#modal").css({
+                display: 'none'
+            })
+        }
+    }
+    $("#screen").on('click', () => {
+        topicModal(false)
+    })
+    function addTopic() {
+        topicModal(true)
+    }
+    $("#topicSave").on('click', () => {
+        var val = $("#topicBox").val().trim().toLowerCase();
+        if(val.length>1){
+        api.post('blog/tag', {
+            blog_id,topic:val
+        }, (code, res) => {
+            topicModal(false)
+            $("#topicBox").val('')
+            if (code == 201) {
+                topics.push(res.topic)
+                renderTopics()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login"
+            }
+        })
+        }
+        else{
+            $("#topicBox").focus()
+        }
+    })
+    $("#topicBox").on('input', () => {
+        var val = $("#topicBox").val().trim().toLowerCase();
+        if(val!='#'){
+        $("#topicBox").val(val)
+        }
+        else{
+            $("#topicBox").val('')
         }
     })
 </script>
