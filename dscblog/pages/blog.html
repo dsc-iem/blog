@@ -70,6 +70,12 @@
 </div>
 <br />
 <br />
+<div class="center topics">
+    {% for topic in blog.topics %}
+    <div class="topic ink-primary">#{{topic}}</div>
+    {% endfor %}
+</div>
+<br/>
 <div class="container" id="more">
         <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
     <hr/>
@@ -92,6 +98,7 @@
         cool:{{blog.reaction_counts.COL}},
         clap:{{blog.reaction_counts.CLP}}
     }
+    const view_key="{{view_key}}"
     var currentReact=REACTS['{{blog.user_reaction}}']
     var blog_id={{blog.blog_id}}
     var is_loading=false;
@@ -134,5 +141,25 @@
     $("#lit").on('click',function(){react('LIT')})
     $("#cool").on('click',function(){react('COL')})
     $("#clap").on('click',function(){react('CLP')})
+    var pingbacks=0
+    function ping(){
+        api.post('blog/pingback', {view_key}, 
+        (scode, res) => {
+            is_loading = false
+            if (scode == 201) {
+                pingbacks=res.pingbacks
+                console.log('pingback',pingbacks)
+            } else if (scode == 400) {
+                console.error(res.msg);
+            } else if (scode == 401) {
+                window.location.href = "/accounts/login?next="+window.location.pathname
+            }
+        }) 
+    }
+    window.setInterval(()=>{
+        if(pingbacks<=30){
+            ping()
+        }
+    },20000)
 </script>
 {% endblock %}

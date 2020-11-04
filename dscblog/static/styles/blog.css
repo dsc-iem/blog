@@ -98,8 +98,25 @@
     background-color: rgba(0, 195, 255, 0.274);
     padding: 0.4rem 0.8rem;
     border-radius: 1rem;
+    -webkit-user-select: none;
 }
 #comments_button:hover{
     background-color: rgba(0, 183, 255, 0.753);
     color: var(--bg);
+}
+#topics{
+    padding: 0rem 0.6rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 22rem;
+  align-items: flex-start;
+  margin: 0px auto;
+}
+.topic{
+    margin: 0.3rem;
+    padding: 0.3rem 1rem;
+    background-color: var(--tertiary);
+    border-radius: 2rem;
+    font-size: 1rem;
+    font-weight: 300;
 }

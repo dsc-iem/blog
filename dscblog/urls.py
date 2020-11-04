@@ -43,6 +43,8 @@ urlpatterns = [
     path('api/blog/title/set', paths.set_blog_title, name='set_blog_title'),
     path('api/blog/image/set', paths.set_blog_img),
     path('api/blog/content/set', paths.set_blog_content),
+    path('api/blog/tag', paths.add_blog_topic),
+    path('api/blog/untag', paths.remove_blog_topic),
     path('api/blog/publish', paths.publish_blog),
     path('api/blog/unpublish', paths.unpublish_blog),
     path('api/blog/delete', paths.delete_blog),
@@ -52,6 +54,7 @@ urlpatterns = [
     path('api/blog/unreact', paths.blog_unreact),
     path('api/blog/comment', paths.blog_comment),
     path('api/blog/uncomment', paths.blog_uncomment),
+    path('api/blog/pingback', paths.pingback),
 ]
 
 handler404 = 'dscblog.paths.page404'

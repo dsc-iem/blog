@@ -77,6 +77,16 @@ input {
   border-radius: 0.3rem;
   outline: none;
 }
+@keyframes focus{
+  0% { box-shadow: 0 0 8px 9px #51a5ff50;}
+  100% { box-shadow: 0 0 3px 4px #007cff63;}
+}
+input:focus {
+  box-shadow: 0 0 3px 4px #007cff63;
+  animation-name: focus;
+  animation-duration: 350ms;
+  animation-direction: alternate-reverse;
+}
 [data-theme="dark"] input{
   background-color: rgb(36, 36, 36);
   color: rgb(211, 211, 211);

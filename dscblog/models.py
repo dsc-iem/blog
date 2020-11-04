@@ -1,14 +1,22 @@
 from django.db import models
-from django.db.models import Q, Avg, Count, Min, Sum
+from django.db.models import Q, F, Avg, Count, Min, Sum, ExpressionWrapper
+from django.contrib.sessions.models import Session
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 import datetime
 from django.utils import timezone
 from dscblog.common import makecode, dump_datetime
+from dscblog.settings import DATABASES
 from django.utils.text import slugify
 import html
 import datetime
 import random
+
+MIN_TRENDING_SCORE = 5
+
+
+def get_top_topics_of_session(session):
+    return Topic.objects.annotate(score=Sum('blogs__views__score', filter=Q(blogs__views__session=session)), views_count=Count('blogs__views', filter=Q(blogs__views__session=session))).order_by('-score', '-views_count', '-created_on')
 
 
 class UserManager(BaseUserManager):
@@ -163,6 +171,9 @@ class User(AbstractUser):
         else:
             return obj
 
+    def get_top_topics(self):
+        return Topic.objects.annotate(score=Sum('blogs__views__score', filter=Q(blogs__views__user=self)), views_count=Count('blogs__views', filter=Q(blogs__views__user=self))).order_by('-score', '-views_count', '-created_on')
+
     def get_author_feed(self):
         return Blog.objects.filter(is_published=True, published_on__gte=timezone.now()-datetime.timedelta(days=3), author__followers__user=self).order_by('-modified_on', '-published_on')
 
@@ -205,9 +216,46 @@ class User(AbstractUser):
         return comments_feed
 
     @classmethod
-    def get_feed(cls,usr=None):
+    def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None):
+        top_topics = init_topics
         posts = []
-        if usr!=None:
+        blogs = []
+        if user != None:
+            for topic in user.get_top_topics()[:7]:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+        elif session != None:
+            for topic in get_top_topics_of_session(session)[:7]:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+        if len(top_topics) < 7:
+            hot_topics = Topic.top_topics()
+            for topic in hot_topics:
+                if topic not in top_topics:
+                    top_topics.append(topic)
+                if len(top_topics) >= 9:
+                    break
+        random.shuffle(top_topics)
+        for topic in top_topics:
+            counter = 0
+            for blog in topic.top_blogs():
+                if blog not in blogs and blog != xcept:
+                    counter += 1
+                    blogs.append(blog)
+                    obj = blog.get_obj_min()
+                    obj['highlight'] = {'type': 'TOPIC',
+                                        'text': topic.name}
+                    posts.append(obj)
+                if counter >= 3:
+                    break
+            if len(posts) >= 12:
+                break
+        return posts
+
+    @classmethod
+    def get_feed(cls, usr=None, session=None):
+        posts = []
+        if usr != None:
             author_feed = usr.get_author_feed()[:5]
             for post in author_feed:
                 obj = post.get_obj_min()
@@ -244,6 +292,9 @@ class User(AbstractUser):
             obj = post.get_obj_min()
             obj['highlight'] = {'type': 'TRENDING', 'text': 'Trending'}
             posts.append(obj)
+        psts = cls.feed_from_top_topics(usr, session)
+        for post in psts:
+            posts.append(post)
         if len(posts) < 25:
             if len(posts) <= 10:
                 recents_feed = Blog.recents()[:10]
@@ -308,6 +359,7 @@ class Blog(models.Model):
     published_on = models.DateTimeField(null=True, default=None)
     is_published = models.BooleanField(default=False)
     score = models.FloatField(verbose_name='Engagement Score', default=0.0)
+    topics = models.ManyToManyField('Topic', related_name="blogs")
 
     def addScore(self, amt):
         self.score = self.score+amt
@@ -318,6 +370,9 @@ class Blog(models.Model):
         self.score = self.score-amt
         self.save()
         return self.score
+
+    def get_topics(self):
+        return self.topics.all()
 
     def get_obj_min(self):
         obj = {'title': self.title, 'img_url': self.img_url, 'blog_id': self.id, 'blog_url': self.get_url(),
@@ -330,6 +385,9 @@ class Blog(models.Model):
         obj['reaction_counts'] = self.get_reaction_counts()
         obj['comments_count'] = self.get_comments_count()
         obj['user_reaction'] = None
+        obj['topics'] = []
+        for topic in self.get_topics():
+            obj['topics'].append(topic.name)
         if user != None:
             react_obj = self.get_user_reaction(user)
             if react_obj != None:
@@ -402,6 +460,26 @@ class Blog(models.Model):
             self.modified_on = timezone.now()
             self.save()
 
+    def has_topic(self, name):
+        try:
+            self.topics.get(name=name)
+        except:
+            return False
+        else:
+            return True
+
+    def add_topic(self, name):
+        return Topic.tag(self, name)
+
+    def remove_topic(self, name):
+        return Topic.untag(self, name)
+
+    def related_blogs(self, user=None, session=None):
+        topics = []
+        for topic in self.get_topics():
+            topics.append(topic)
+        return User.feed_from_top_topics(user, session, topics, self)[:6]
+
     @classmethod
     def create(cls, author, title):
         obj = cls(author=author, title=title, created_on=timezone.now(),
@@ -415,8 +493,30 @@ class Blog(models.Model):
 
     @classmethod
     def trending(cls):
-        return cls.objects.filter(is_published=True,
-                                  published_on__gte=timezone.now()-datetime.timedelta(days=3)).order_by('-score', '-published_on')
+        if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+            return cls.objects.annotate(
+                engagement_recency=Avg(
+                    ExpressionWrapper(
+                        timezone.now(
+                        )-F('views__date'), output_field=models.IntegerField()
+                    ))).filter(is_published=True,
+                               engagement_recency__lte=3*24*60*60, score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+        else:
+            return cls.objects.annotate(
+                engagement_recency=Avg(
+                    ExpressionWrapper(timezone.now(
+                    )-F('views__date'), output_field=models.DurationField())
+                )).filter(is_published=True,
+                          engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+
+    @classmethod
+    def by_recent_engagement(cls):
+        return cls.objects.annotate(
+            engagement_recency=Avg(
+                ExpressionWrapper(
+                    timezone.now(
+                    )-F('views__date'), output_field=models.IntegerField()
+                ))).filter(is_published=True).order_by('engagement_recency', '-score')
 
     @classmethod
     def top25(cls):
@@ -432,6 +532,157 @@ class Blog(models.Model):
 
     def __str__(self):
         return str(self.id)+'. '+self.title
+
+
+class Topic(models.Model):
+    name = models.CharField(
+        max_length=30, verbose_name='Name', primary_key=True)
+    created_on = models.DateTimeField()
+
+    def remove(self):
+        self.delete()
+
+    def top_blogs(self):
+        field = models.DurationField()
+        if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+            field = models.IntegerField()
+        return self.blogs.filter(is_published=True).annotate(
+            engagement_recency=Avg(
+                ExpressionWrapper(
+                    timezone.now(
+                    )-F('views__date'), output_field=field
+                ))).order_by('engagement_recency', '-score', '-published_on')
+
+    def recent_blogs(self):
+        return self.blogs.filter(is_published=True).order_by('-modified_on', '-published_on')
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.objects.get(name=name)
+
+    @classmethod
+    def tag(cls, blog, name):
+        try:
+            existing = cls.get_by_name(name=name)
+        except:
+            if len(name) <= 30:
+                topic = cls(name=name, created_on=timezone.now())
+                topic.save()
+                blog.topics.add(topic)
+                blog.save()
+                return topic
+            else:
+                return None
+        else:
+            blog.topics.add(existing)
+            blog.save()
+            return existing
+
+    @classmethod
+    def untag(cls, blog, name):
+        try:
+            topic = cls.get_by_name(name)
+        except:
+            return False
+        else:
+            if blog.has_topic(name):
+                blog.topics.remove(topic)
+                blog.save()
+                if topic.blogs.count() == 0:
+                    topic.remove()
+                return True
+            else:
+                return False
+
+    @classmethod
+    def top_topics(cls):
+        return cls.objects.annotate(score=Sum('blogs__score')).order_by('-score', '-created_on')
+
+
+class View(models.Model):
+    user = models.ForeignKey(
+        User, related_name="viewed", on_delete=models.SET_NULL, null=True, default=None)
+    session = models.ForeignKey(
+        Session, related_name="viewed",  on_delete=models.SET_NULL, null=True, default=None)
+    blog = models.ForeignKey(
+        Blog, related_name="views", on_delete=models.CASCADE)
+    score = models.FloatField(verbose_name='Engagement Score', default=1.0)
+    date = models.DateTimeField()
+    key = models.CharField(max_length=30, verbose_name='Key')
+    pingbacks = models.IntegerField(default=0)
+    last_pingback_date = models.DateTimeField(null=True, default=None)
+
+    def remove(self):
+        self.delete()
+
+    def addScore(self, amt):
+        self.score = self.score+amt
+        self.save()
+        return self.score
+
+    def reduceScore(self, amt):
+        self.score = self.score-amt
+        self.save()
+        return self.score
+
+    def pingback(self):
+        time_diff = timezone.now()-self.last_pingback_date
+        if self.pingbacks <= 30 and time_diff >= datetime.timedelta(seconds=20) and time_diff <= datetime.timedelta(minutes=2):
+            self.pingbacks += 1
+            self.score += 0.07
+            self.blog.addScore(0.07)
+            self.last_pingback_date = timezone.now()
+            self.save()
+        return self.pingbacks
+
+    @classmethod
+    def create(cls, user, blog, session=None):
+        try:
+            existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
+            )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
+        except:
+            score = 0.1
+            prev = cls.objects.filter(user=user, blog=blog, session=session)
+            prev_count = prev.count()
+            if prev_count == 0:
+                score = 0.5
+            elif prev_count <= 5:
+                score = 0.3
+            else:
+                score = 0.1
+            blog.addScore(score)
+            obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
+                      last_pingback_date=timezone.now(), score=score, key=makecode())
+            obj.save()
+            return obj.key
+        else:
+            existing.last_pingback_date = timezone.now()
+            existing.save()
+            return existing.key
+
+    @classmethod
+    def get_active(cls, user, blog, session=None):
+        return cls.objects.filter(user=user, blog=blog, session=session,
+                                  last_pingback_date__gte=timezone.now()-datetime.timedelta(hours=1)).order_by('-last_pingback_date')[0]
+
+    @classmethod
+    def add_score(cls, user, blog, val=0.1, session=None):
+        try:
+            view = cls.get_active(user, blog, session)
+        except:
+            return False
+        else:
+            view.add_score(val)
+            return True
+
+    @classmethod
+    def convert_to_user(cls, session, user):
+        cls.objects.filter(user=None, session=session).update(
+            user=user, session=None)
+
+    @classmethod
+    def get_by_key(cls, key):
+        return cls.objects.get(key=key, last_pingback_date__gte=timezone.now()-datetime.timedelta(hours=1))
 
 
 class Reaction(models.Model):
@@ -484,6 +735,7 @@ class Reaction(models.Model):
                       reaction=reaction, date=timezone.now())
             obj.save()
             blog.addScore(cls.SCORE)
+            View.addScore(user, blog, cls.SCORE)
             return obj
         else:
             existing.reaction = reaction
@@ -506,7 +758,7 @@ class Comment(models.Model):
         'Comment', related_name="replies", null=True, default=None, on_delete=models.SET_NULL)
     date = models.DateTimeField()
 
-    def delete(self):
+    def remove(self):
         self.delete()
 
     def get_obj(self, user=None):
@@ -530,12 +782,15 @@ class Comment(models.Model):
         if user != blog.author:
             if reference:
                 blog.addScore(0.4)
+                View.addScore(user, blog, 0.4)
             else:
                 # First comment of the user
                 if user.commented.filter(blog=blog).count() <= 1:
                     blog.addScore(0.5)
+                    View.addScore(user, blog, 0.5)
                 else:
                     blog.addScore(0.3)
+                    View.addScore(user, blog, 0.3)
         else:
             blog.addScore(0.1)
         return obj
