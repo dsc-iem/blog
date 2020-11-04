@@ -543,11 +543,14 @@ class Topic(models.Model):
         self.delete()
 
     def top_blogs(self):
+        field = models.DurationField()
+        if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+            field = models.IntegerField()
         return self.blogs.filter(is_published=True).annotate(
             engagement_recency=Avg(
                 ExpressionWrapper(
                     timezone.now(
-                    )-F('views__date'), output_field=models.IntegerField()
+                    )-F('views__date'), output_field=field
                 ))).order_by('engagement_recency', '-score', '-published_on')
 
     def recent_blogs(self):
