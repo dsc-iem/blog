@@ -9,10 +9,11 @@ from dscblog.forms import UserSettingsForm
 import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
+import bleach
 
 
 md = markdown.Markdown(
-    extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
+    extensions=['extra','fenced_code', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
 
 
 def convert_session_to_user(request):
@@ -57,7 +58,7 @@ def index(request):
         opts['featured_blog'] = None
     else:
         opts['featured_blog'] = featured.get_obj_min()
-        opts['featured_blog']['intro'] = featured.content[:300]
+        opts['featured_blog']['intro'] = html.escape(featured.content[:300])
     res = render(request, 'index.html', opts)
     return res
 
@@ -215,10 +216,11 @@ def blog(request, slug, id):
     else:
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
+                htm=md.reset().convert(b.content)
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
-                    'html': md.reset().convert(b.content),
+                    'html': htm,
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
@@ -613,8 +615,7 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content = html.escape(
-                        request.POST['content']).replace('&gt;', '>')
+                    content = request.POST['content']
                     b.update_content(content)
                     return apiRespond(201)
                 else:

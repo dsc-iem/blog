@@ -398,7 +398,7 @@ class Blog(models.Model):
                'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
         return obj
 
-    def get_obj(self, user=None, escape_html=True):
+    def get_obj(self, user=None, escape_html=False):
         obj = self.get_obj_min()
         obj['content'] = self.content
         obj['reaction_counts'] = self.get_reaction_counts()
@@ -411,8 +411,8 @@ class Blog(models.Model):
             react_obj = self.get_user_reaction(user)
             if react_obj != None:
                 obj['user_reaction'] = react_obj.reaction
-        if not escape_html:
-            obj['content'] = html.unescape(obj['content'])
+        if escape_html:
+            obj['content'] = html.escape(obj['content'])
         return obj
 
     def get_comments_count(self):
