@@ -10,10 +10,13 @@ import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
 import bleach
+from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
 
+
+markdown_attrs['*']+=['class']
 
 md = markdown.Markdown(
-    extensions=['extra','fenced_code', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
+    extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
 
 
 def convert_session_to_user(request):
@@ -76,6 +79,7 @@ def top25(request):
     res = render(request, 'top25.html', opts)
     return res
 
+
 def new_blogs(request):
     convert_session_to_user(request)
     opts = {'header': {
@@ -88,6 +92,7 @@ def new_blogs(request):
         opts['blogs'].append(b.get_obj_min())
     res = render(request, 'new.html', opts)
     return res
+
 
 def trending_blogs(request):
     convert_session_to_user(request)
@@ -102,9 +107,10 @@ def trending_blogs(request):
     res = render(request, 'trending.html', opts)
     return res
 
-def topic(request,topic):
-    _topic=topic.strip().lower().replace(" ", "")
-    if _topic==topic:
+
+def topic(request, topic):
+    _topic = topic.strip().lower().replace(" ", "")
+    if _topic == topic:
         convert_session_to_user(request)
         opts = {'header': {
             'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': topic}
@@ -112,7 +118,7 @@ def topic(request,topic):
             opts['header']['is_loggedin'] = True
         opts['blogs'] = []
         try:
-            t=Topic.get_by_name(topic)
+            t = Topic.get_by_name(topic)
         except:
             pass
         else:
@@ -123,6 +129,7 @@ def topic(request,topic):
         return res
     else:
         return redirect(to='/topic/'+_topic)
+
 
 @login_required
 def my_profile(request):
@@ -184,7 +191,7 @@ def user_settings(request):
     else:
         form = UserSettingsForm(instance=request.user)
     opts = {'header': {
-        'is_loggedin': True, 'is_empty': False},
+        'is_loggedin': True, 'is_empty': False, 'float': True},
         'form': form}
     return render(request, 'userSettings.html', opts)
 
@@ -192,7 +199,7 @@ def user_settings(request):
 def profile(request, username):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False},
+        'is_loggedin': False, 'is_empty': False, 'float': True},
         'is_owner': request.user.is_authenticated and request.user.username == username}
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
@@ -216,7 +223,7 @@ def blog(request, slug, id):
     else:
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
-                htm=md.reset().convert(b.content)
+                htm = bleach.clean(md.reset().convert(b.content), tags=markdown_tags+['dl'],attributes =markdown_attrs,styles=all_styles)
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
@@ -290,7 +297,7 @@ def blog_settings(request, id):
         return page404(request)
     else:
         if request.user == b.author:
-            opts = {'header': {'is_loggedin': True, 'is_empty': False},
+            opts = {'header': {'is_loggedin': True, 'is_empty': False, 'float': True},
                     'blog': b.get_obj_min()}
             topics = []
             for topic in b.get_topics():
