@@ -9,6 +9,14 @@
     padding-bottom: 3rem;
     font-family: Gravity,HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
 }
+#topic_title{
+    font-size: 3rem;
+    line-height: 0.6em;
+    font-weight: 200;
+    padding-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+}
 @media(max-width:600px){
     #s1_title{
         font-size: 4rem
