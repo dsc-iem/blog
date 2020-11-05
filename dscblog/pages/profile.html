@@ -38,7 +38,17 @@
     {% endif %}
     <hr />
     <br/>
+    {% if user.blogs %}
     {% include "blocks/blogsGrid.html" with items=user.blogs  %}
+    {% elif user.is_self %}
+    <div class="center ink-blue base-semilight size-s" style="min-height: 30vh;">
+       <a href="/create">Write your first blog</a> 
+    </div>
+    {% else %}
+    <div class="center ink-grey base-regular size-m" style="min-height: 30vh;">
+        No posts yet
+    </div>
+    {% endif %}
 </div>
 <script>
     const user_id={{user.user_id}}
