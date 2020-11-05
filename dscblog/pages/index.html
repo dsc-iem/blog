@@ -3,6 +3,7 @@
 <script src="/static/scripts/parallax.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/styles/index.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+{% include "blocks/catalogue.html"  %}
 {% if featured_blog %}
 <div class="ft_img" data-parallax="scroll" data-speed="0.5" data-image-src="{{featured_blog.img_url}}">
 </div>

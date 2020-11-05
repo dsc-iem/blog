@@ -216,6 +216,25 @@ class User(AbstractUser):
         return comments_feed
 
     @classmethod
+    def get_catagories(cls, user=None, session=None):
+        topics = []
+        if user != None:
+            topics = list(user.get_top_topics()[:5])
+        elif session != None:
+            topics = list(get_top_topics_of_session(session)[:5])
+        if len(topics) < 5:
+            for topic in Topic.top_topics():
+                if topic not in topics:
+                    topics.append(topic)
+                if len(topics) >= 5:
+                    break
+        #random.shuffle(topics)
+        names = []
+        for topic in topics:
+            names.append(topic.name)
+        return ['all', 'popular', 'new', 'trending']+names
+
+    @classmethod
     def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None):
         top_topics = init_topics
         posts = []
@@ -524,17 +543,20 @@ class Blog(models.Model):
 
     @classmethod
     def recent4(cls):
-        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:4]
+        return cls.objects.filter(is_published=True).order_by('-published_on')[:4]
 
     @classmethod
     def recents(cls):
-        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')
+        return cls.objects.filter(is_published=True).order_by('-published_on')
 
     def __str__(self):
         return str(self.id)+'. '+self.title
 
 
 class Topic(models.Model):
+    BANNED = ['all', 'trending', 'new', 'recents', 'feed', 'recent', 'feeds', 'recommended',
+              'recommendation', 'read', 'latest', 'newpost', 'new-post', 'comment',
+              'popular', 'hot', 'top', 'blog', 'blogging', 'cool', 'like', 'likes']
     name = models.CharField(
         max_length=30, verbose_name='Name', primary_key=True)
     created_on = models.DateTimeField()
@@ -554,7 +576,7 @@ class Topic(models.Model):
                 ))).order_by('engagement_recency', '-score', '-published_on')
 
     def recent_blogs(self):
-        return self.blogs.filter(is_published=True).order_by('-modified_on', '-published_on')
+        return self.blogs.filter(is_published=True).order_by('-published_on')
 
     @classmethod
     def get_by_name(cls, name):
@@ -597,6 +619,9 @@ class Topic(models.Model):
     @classmethod
     def top_topics(cls):
         return cls.objects.annotate(score=Sum('blogs__score')).order_by('-score', '-created_on')
+
+    def __str__(self):
+        return self.name
 
 
 class View(models.Model):

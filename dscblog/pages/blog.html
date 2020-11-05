@@ -72,7 +72,7 @@
 <br />
 <div class="center topics">
     {% for topic in blog.topics %}
-    <div class="topic ink-primary">#{{topic}}</div>
+    <a href="/topic/{{topic}}" class="topic ink-secondary">#{{topic}}</a>
     {% endfor %}
 </div>
 <br/>

@@ -30,10 +30,20 @@ def get_session(request):
         return None
 
 
+def get_catagories(request):
+    user = None
+    session = None
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        session = get_session(request)
+    return User.get_catagories(user, session)
+
+
 def index(request):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False}}
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'all'}
     opts['blogs'] = []
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
@@ -55,7 +65,7 @@ def index(request):
 def top25(request):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False}}
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'popular'}
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
     opts['blogs'] = []
@@ -65,10 +75,67 @@ def top25(request):
     res = render(request, 'top25.html', opts)
     return res
 
+def new_blogs(request):
+    convert_session_to_user(request)
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'new'}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.recents()[:30]
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
+    res = render(request, 'new.html', opts)
+    return res
+
+def trending_blogs(request):
+    convert_session_to_user(request)
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'trending'}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.trending()[:30]
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
+    res = render(request, 'trending.html', opts)
+    return res
+
+def topic(request,topic):
+    _topic=topic.strip().lower().replace(" ", "")
+    if _topic==topic:
+        convert_session_to_user(request)
+        opts = {'header': {
+            'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': topic}
+        if request.user.is_authenticated:
+            opts['header']['is_loggedin'] = True
+        opts['blogs'] = []
+        try:
+            t=Topic.get_by_name(topic)
+        except:
+            pass
+        else:
+            blogs = t.top_blogs()[:30]
+            for b in blogs:
+                opts['blogs'].append(b.get_obj_min())
+        res = render(request, 'topic.html', opts)
+        return res
+    else:
+        return redirect(to='/topic/'+_topic)
 
 @login_required
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
+
+
+def cat(request, topic):
+    pages = ['popular', 'new', 'trending']
+    if topic == 'all':
+        return redirect(to='/')
+    elif topic in pages:
+        return redirect(to='/'+topic)
+    else:
+        return redirect(to='/topic/'+topic)
 
 
 def followers(request, username):
@@ -157,12 +224,13 @@ def blog(request, slug, id):
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                     view_key = View.create(user=request.user, blog=b)
-                    opts['more_blogs']=b.related_blogs(user=request.user)
+                    opts['more_blogs'] = b.related_blogs(user=request.user)
                 else:
                     request.session['has_views'] = True
                     view_key = View.create(
                         user=None, blog=b, session=get_session(request))
-                    opts['more_blogs']=b.related_blogs(session=get_session(request))
+                    opts['more_blogs'] = b.related_blogs(
+                        session=get_session(request))
                 opts['view_key'] = view_key
                 res = render(request, 'blog.html', opts)
                 return res
@@ -406,13 +474,17 @@ def add_blog_topic(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    topic = request.POST['topic'].strip().lower()
+                    topic = request.POST['topic'].strip(
+                    ).lower().replace(" ", "")
                     if len(topic) > 1:
-                        if not b.has_topic(topic):
-                            b.add_topic(topic)
-                            return apiRespond(201, topic=topic)
+                        if topic not in Topic.BANNED:
+                            if not b.has_topic(topic):
+                                b.add_topic(topic)
+                                return apiRespond(201, topic=topic)
+                            else:
+                                return apiRespond(400, msg='Topic already tagged')
                         else:
-                            return apiRespond(400, msg='Topic already tagged')
+                            return apiRespond(400, msg='This topic is disabled')
                     else:
                         return apiRespond(400, msg='Topic name too short')
                 else:
@@ -433,7 +505,8 @@ def remove_blog_topic(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    topic = request.POST['topic'].strip().lower()
+                    topic = request.POST['topic'].strip(
+                    ).lower().replace(" ", "")
                     if b.remove_topic(topic):
                         return apiRespond(201, topic=topic)
                     else:
