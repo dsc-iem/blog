@@ -1,122 +1,215 @@
-.blog-title{
-    padding: 0.5rem 0px;
+.blog-title {
+  padding: 0.5rem 0px;
+  line-height: normal;
+  padding-bottom: 1.5rem;
 }
-.author-info{
-    width:35em;
-    max-width: 100%;
-    margin: 0 auto;
-    margin-top: 2rem;
+.author-info {
+  width: 35em;
+  max-width: 100%;
+  margin: 0 auto;
+  margin-top: 2rem;
 }
-.blog-author{
-    width: fit-content;
-    display: block;
-    padding-left: 0rem;
-    text-decoration: none;
-    margin-bottom: 0.2rem;
+.blog-author {
+  width: fit-content;
+  display: block;
+  padding-left: 0rem;
+  text-decoration: none;
+  margin-bottom: 0.2rem;
 }
-.author_avatar{
-    font-size: 2.6rem;
-    margin: 0.3rem;
-    margin-right: 1rem;
-    border-radius: 50%;
+.author_avatar {
+  font-size: 2.6rem;
+  margin: 0.3rem;
+  margin-right: 1rem;
+  border-radius: 50%;
 }
-.blog-author:hover{
-    color: var(--primary);
+.blog-author:hover {
+  color: var(--primary);
 }
-.blog_opts{
-    max-width: 34em;
+.blog_opts {
+  max-width: 34em;
 }
-.b_img{
-    width:100%;
-    height: 32rem;
-    max-height: 78vh;
-    position: relative;
-    background: transparent;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    top:0px;
-    left: 0px;
+.b_img {
+  width: 100%;
+  height: 32rem;
+  max-height: 78vh;
+  position: relative;
+  background: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  top: 0px;
+  left: 0px;
 }
-.parallax-mirror{
-    z-index: 0 !important;
+.parallax-mirror {
+  z-index: 0 !important;
 }
-@media(max-width:700px){
-    .b_img{
-        max-height: 45vh;
-        min-height: 15rem;
-    }
+@media (max-width: 700px) {
+  .b_img {
+    max-height: 45vh;
+    min-height: 15rem;
+  }
 }
-#header{
-    background: linear-gradient(rgba(0, 0, 0, 0.685),rgba(0, 0, 0, 0))!important;
-    position: absolute;
-    top:0px;
-    z-index: 1;
+#header {
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.685),
+    rgba(0, 0, 0, 0)
+  ) !important;
+  position: absolute;
+  top: 0px;
+  z-index: 1;
 }
-#react_box{
-    padding: 1.2rem 0.8rem;
-    max-width: 100%;
-    overflow: auto;
+#react_box {
+  padding: 1.2rem 0.8rem;
+  max-width: 100%;
+  overflow: auto;
 }
-.react{
-    margin: 0.4rem 0.5rem;
-    padding: 0.4rem 0.6rem;
-    background-color: rgb(238, 238, 238);
-    border-radius: 0.3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    -webkit-user-select: none;
-    cursor: pointer;
-    font-size: 1rem;
+.react {
+  margin: 0.4rem 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background-color: rgb(238, 238, 238);
+  border-radius: 0.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-size: 1rem;
 }
-.react.active{
-    background-color: rgb(187, 228, 255);
+.react.active {
+  background-color: rgb(187, 228, 255);
 }
-.react_count{
-    font-size: 0.85rem;
-    font-weight: 300;
-    color:var(--secondary);
-    padding-left: 0.2rem;
+.react_count {
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--secondary);
+  padding-left: 0.2rem;
 }
-[data-theme='dark'] .react{
-    background-color: rgb(34, 34, 34);
+[data-theme="dark"] .react {
+  background-color: rgb(34, 34, 34);
 }
-[data-theme='dark'] .react.active{
-    background-color: rgb(11, 45, 61);
+[data-theme="dark"] .react.active {
+  background-color: rgb(11, 45, 61);
 }
-@media(max-width:700px){
-    .react{
-        margin: 0.4rem 0.2rem;
-    }
-    #react_box{
-        justify-content: space-around;
-    }
+@media (max-width: 700px) {
+  .react {
+    margin: 0.4rem 0.2rem;
+  }
+  #react_box {
+    justify-content: space-around;
+  }
 }
-#comments_button{
-    background-color: rgba(0, 195, 255, 0.274);
-    padding: 0.4rem 0.8rem;
-    border-radius: 1rem;
-    -webkit-user-select: none;
+#comments_button {
+  background-color: rgba(0, 195, 255, 0.274);
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  -webkit-user-select: none;
 }
-#comments_button:hover{
-    background-color: rgba(0, 183, 255, 0.753);
-    color: var(--bg);
+#comments_button:hover {
+  background-color: rgba(0, 183, 255, 0.753);
+  color: var(--bg);
 }
-#topics{
-    padding: 0rem 0.6rem;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 22rem;
+#topics {
+  padding: 0rem 0.6rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  max-width: 22rem;
   align-items: flex-start;
   margin: 0px auto;
 }
-.topic{
-    margin: 0.3rem;
-    padding: 0.3rem 1rem;
+.topic {
+  margin: 0.3rem;
+  padding: 0.3rem 1rem;
+  background-color: var(--tertiary);
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 300;
+}
+#b_head {
+  display: none;
+  position: fixed;
+  top: 0rem;
+  left: 0px;
+  width: 100%;
+  padding: 0rem;
+  z-index: 2;
+  overflow: hidden;
+  justify-content: space-between;
+  background-color: rgba(246, 246, 246, 0.61);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  height: 3rem;
+  box-shadow: 0px 2px 11px 2px #00000012;
+  align-items: center;
+}
+#bhd_icon {
+  height: 100%;
+  min-width: 6rem;
+}
+#bhd_share {
+  height: 100%;
+  min-width: 4rem;
+  padding: 0.3rem 0.5rem;
+}
+#bhd_like {
+  display: none;
+}
+#b_head.float {
+  display: flex;
+}
+[data-theme="dark"] #b_head {
+  background-color: rgba(0, 0, 0, 0.466);
+  box-shadow: none;
+}
+.share_link {
+  padding: 0.4rem 1.2rem;
+  margin: 0rem 0.3rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  user-select: none;
+}
+.share_box .share_link {
+  background-color: var(--tertiary);
+}
+@keyframes sharefocus {
+  0% {
+    background-color: transparent;
+  }
+  100% {
     background-color: var(--tertiary);
-    border-radius: 2rem;
-    font-size: 1rem;
-    font-weight: 300;
+  }
+}
+@keyframes shareboxfocus {
+  0% {
+    background-color: var(--tertiary);
+  }
+  100% {
+    background-color: var(--primary);
+  }
+}
+.share_link:hover {
+  opacity: 1;
+  background-color: var(--tertiary);
+  animation-name: sharefocus;
+  animation-duration: 150ms;
+}
+.share_box .share_link:hover {
+  opacity: 1;
+  background-color: var(--primary);
+  animation-name: shareboxfocus;
+}
+@media (max-width: 700px) {
+  #bhd_like {
+    display: flex;
+  }
+  #b_head.float {
+    display: grid;
+    grid-template-columns: 4rem auto 4rem;
+  }
+  #bhd_share .share_link {
+    display: none;
+  }
+  #bhd_share .share_link.export {
+    display: flex;
+  }
 }

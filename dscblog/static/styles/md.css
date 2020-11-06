@@ -135,6 +135,7 @@ var {
   font-size: 90%;
   font-family: "Roboto Mono", monospace;
   font-weight: 300;
+  line-height: 1.4em;
 }
 
 pre {

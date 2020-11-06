@@ -12,6 +12,7 @@ from pyembed.markdown import PyEmbedMarkdown
 import bleach
 from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
 from urllib.parse import urlparse
+from dscblog.settings import BASE_URL
 
 
 markdown_attrs['*'] += ['class']
@@ -180,7 +181,7 @@ def blog_reactions(request, id):
         return page404(request)
     else:
         if request.user == b.author:
-            data = {'header': {'is_loggedin': True},
+            data = {'header': {'is_loggedin': True, 'float': True},
                     'users': [], 'blog': b.get_obj_min()}
             reactions = b.get_reactions()
             for reaction in reactions:
@@ -238,6 +239,7 @@ def blog(request, slug, id):
                     b.content), tags=markdown_tags+['dl'], attributes=markdown_attrs, styles=all_styles)
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
+                    'BASE_URL':BASE_URL,
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': htm,
                     'more_blogs': [],

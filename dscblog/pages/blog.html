@@ -9,7 +9,22 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/monokai.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
 <div id="b_head">
-
+    <div id="bhd_like"></div>
+    <div class="center" id="bhd_icon">
+    <a href="/"><img class="icon" style="font-size: 2.5rem;margin: 0px;" src="/static/icons/icon.png" /></a>    
+    </div>
+    <div id="bhd_share" class="center">
+        <a 
+        href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
+        class="share_link fb center">
+        <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/fb_share.png" />
+        </a>
+        <a class="share_link tw center" href="https://twitter.com/intent/tweet?text={{blog.title}}&url={{BASE_URL}}{{blog.blog_url}}">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/twitter_share.png" />
+        </a>
+        <a onclick="shareLink()" class="share_link link center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/link_share.png" /></a>
+        <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
+    </div>
 </div>
 <div class="b_img" data-parallax="scroll" data-speed="0.7" data-image-src="{{blog.img_url}}" >
 </div>
@@ -78,6 +93,19 @@
     {% endfor %}
 </div>
 <br/>
+    <div class="center share_box">
+        <a 
+        href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
+        class="share_link fb center">
+        <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/fb_share.png" />
+        </a>
+        <a class="share_link tw center" href="https://twitter.com/intent/tweet?text={{blog.title}}&url={{BASE_URL}}{{blog.blog_url}}">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/twitter_share.png" />
+        </a>
+        <a onclick="shareLink()" class="share_link link center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/link_share.png" /></a>
+        <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
+    </div>
+<br/>
 <div class="container" id="more">
         <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
     <hr/>
@@ -85,6 +113,52 @@
 </div>
 <br />
 <script>
+     var isFloating = false;
+    $(window).scroll(() => {
+        if (window.pageYOffset > 500) {
+            if (!isFloating) {
+                $("#b_head").addClass('float')
+                isFloating = true
+            }
+        } else {
+            if (isFloating) {
+                $("#b_head").removeClass('float')
+                isFloating = false
+            }
+        }
+    });
+    function shareLink(){
+        const clipText = window.location.href
+        var promise = navigator.clipboard.writeText(clipText).then(() => {
+                alert("Link copied to clipboard")
+            }, () => {
+                console.error("Failed to copy to clipboard")
+            });
+    }
+    function exportLink(){
+        const url = window.location.href
+        const shareData = {
+            title: '{{blog.title}}',
+            text: "{{blog.content|truncatewords:20}}",
+            url,
+        }
+        const clipText = url
+        if (navigator.share) {
+            // Web Share API is supported
+            window.navigator.share(shareData).then(() => {
+                console.log("Link shared")
+            })
+                .catch((e) => {
+                    console.error(e)
+                });
+        } else {
+            var promise = navigator.clipboard.writeText(clipText).then(() => {
+                alert("Link copied to clipboard")
+            }, () => {
+                console.error("Failed to copy to clipboard")
+            });
+        }
+    }
     const REACTS={
     'LIK':'like',
     'LOV':'love',
