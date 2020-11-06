@@ -11,6 +11,7 @@ import html
 from pyembed.markdown import PyEmbedMarkdown
 import bleach
 from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
+from urllib.parse import urlparse
 
 
 markdown_attrs['*'] += ['class']
@@ -25,6 +26,12 @@ def convert_session_to_user(request):
         if request.session.get('has_views', False):
             View.convert_to_user(session, request.user)
             request.session['has_views'] = False
+
+
+def get_domain_from_url(url):
+    parsed_uri = urlparse(url)
+    result = '{uri.netloc}'.format(uri=parsed_uri)
+    return result
 
 
 def get_session(request):
@@ -43,8 +50,10 @@ def get_catagories(request):
         session = get_session(request)
     return User.get_catagories(user, session)
 
+
 def check_referer(request):
-    return render(request, 'referer.html')
+    return render(request, 'referer.html', {'ref': request.META.get('HTTP_REFERER', 'Direct')})
+
 
 def index(request):
     convert_session_to_user(request)
@@ -233,15 +242,17 @@ def blog(request, slug, id):
                     'html': htm,
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
+                ref = get_domain_from_url(
+                    request.META.get('HTTP_REFERER', None))
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                     view_key = View.create(
-                        user=request.user, blog=b, referer=request.META['HTTP_REFERER'])
+                        user=request.user, blog=b, referer=ref)
                     opts['more_blogs'] = b.related_blogs(user=request.user)
                 else:
                     request.session['has_views'] = True
                     view_key = View.create(
-                        user=None, blog=b, session=get_session(request), referer=request.META['HTTP_REFERER'])
+                        user=None, blog=b, session=get_session(request), referer=ref)
                     opts['more_blogs'] = b.related_blogs(
                         session=get_session(request))
                 opts['view_key'] = view_key
