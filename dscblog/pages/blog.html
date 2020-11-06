@@ -139,7 +139,7 @@
         const url = window.location.href
         const shareData = {
             title: '{{blog.title}}',
-            text: "{{blog.content|truncatewords:20}}",
+            text: "{{blog.title}} \ {{blog.content|truncatewords:20}}",
             url,
         }
         const clipText = url
