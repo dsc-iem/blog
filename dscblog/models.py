@@ -228,7 +228,7 @@ class User(AbstractUser):
                     topics.append(topic)
                 if len(topics) >= 5:
                     break
-        #random.shuffle(topics)
+        # random.shuffle(topics)
         names = []
         for topic in topics:
             names.append(topic.name)
@@ -367,8 +367,8 @@ class Follower(models.Model):
 
 
 class Blog(models.Model):
-    title = models.CharField(max_length=60, verbose_name='Title')
-    img_url = models.CharField(max_length=150, null=True, default=None)
+    title = models.CharField(max_length=200, verbose_name='Title')
+    img_url = models.CharField(max_length=200, null=True, default=None)
     content = models.CharField(
         max_length=20000, verbose_name='Content', default='')
     author = models.ForeignKey(
@@ -631,6 +631,8 @@ class View(models.Model):
         Session, related_name="viewed",  on_delete=models.SET_NULL, null=True, default=None)
     blog = models.ForeignKey(
         Blog, related_name="views", on_delete=models.CASCADE)
+    referer = models.CharField(
+        max_length=400, verbose_name='Referer Site', null=True, default=None)
     score = models.FloatField(verbose_name='Engagement Score', default=1.0)
     date = models.DateTimeField()
     key = models.CharField(max_length=30, verbose_name='Key')
@@ -661,7 +663,7 @@ class View(models.Model):
         return self.pingbacks
 
     @classmethod
-    def create(cls, user, blog, session=None):
+    def create(cls, user, blog, session=None, referer=None):
         try:
             existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
             )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
@@ -677,7 +679,7 @@ class View(models.Model):
                 score = 0.1
             blog.addScore(score)
             obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
-                      last_pingback_date=timezone.now(), score=score, key=makecode())
+                      last_pingback_date=timezone.now(), score=score, key=makecode(), referer=referer)
             obj.save()
             return obj.key
         else:

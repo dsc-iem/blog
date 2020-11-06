@@ -13,7 +13,7 @@ import bleach
 from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
 
 
-markdown_attrs['*']+=['class']
+markdown_attrs['*'] += ['class']
 
 md = markdown.Markdown(
     extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
@@ -43,6 +43,8 @@ def get_catagories(request):
         session = get_session(request)
     return User.get_catagories(user, session)
 
+def check_referer(request):
+    return render(request, 'referer.html')
 
 def index(request):
     convert_session_to_user(request)
@@ -223,7 +225,8 @@ def blog(request, slug, id):
     else:
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
-                htm = bleach.clean(md.reset().convert(b.content), tags=markdown_tags+['dl'],attributes =markdown_attrs,styles=all_styles)
+                htm = bleach.clean(md.reset().convert(
+                    b.content), tags=markdown_tags+['dl'], attributes=markdown_attrs, styles=all_styles)
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': True},
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
@@ -232,12 +235,13 @@ def blog(request, slug, id):
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
-                    view_key = View.create(user=request.user, blog=b)
+                    view_key = View.create(
+                        user=request.user, blog=b, referer=request.META['HTTP_REFERER'])
                     opts['more_blogs'] = b.related_blogs(user=request.user)
                 else:
                     request.session['has_views'] = True
                     view_key = View.create(
-                        user=None, blog=b, session=get_session(request))
+                        user=None, blog=b, session=get_session(request), referer=request.META['HTTP_REFERER'])
                     opts['more_blogs'] = b.related_blogs(
                         session=get_session(request))
                 opts['view_key'] = view_key

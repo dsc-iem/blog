@@ -8,6 +8,9 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/monokai.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+<div id="b_head">
+
+</div>
 <div class="b_img" data-parallax="scroll" data-speed="0.7" data-image-src="{{blog.img_url}}" >
 </div>
 <div class="container blog_opts">
@@ -44,14 +47,13 @@
 </div>
 <div class="markdown">
     <div class="size-xxl ink-primary base-regular blog-title">{{blog.title}}</div>
-    <br/>
     {% autoescape off %}
     {{html}}
     {% endautoescape %}
 </div>
 <div id="react_box" class="center">
     <div class="react" id="like">👍<div class="react_count" id="like_count">{{blog.reaction_counts.LIK}}</div></div>
-    <div class="react" id="love">❤<div class="react_count" id="love_count">{{blog.reaction_counts.LOV}}</div></div>
+    <div class="react" id="love" style="color: red;">❤<div class="react_count" id="love_count">{{blog.reaction_counts.LOV}}</div></div>
     <div class="react" id="lit">🔥<div class="react_count" id="lit_count">{{blog.reaction_counts.LIT}}</div></div>
     <div class="react" id="cool">🆒<div class="react_count" id="cool_count">{{blog.reaction_counts.COL}}</div></div>
     <div class="react" id="clap">👏<div class="react_count" id="clap_count">{{blog.reaction_counts.CLP}}</div></div>
