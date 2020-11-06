@@ -52,7 +52,7 @@ def get_catagories(request):
 
 
 def check_referer(request):
-    return render(request, 'referer.html', {'ref': request.META.get('HTTP_REFERER', 'Direct')})
+    return render(request, 'referer.html', {'ref': get_domain_from_url(request.META.get('HTTP_REFERER', ''))})
 
 
 def index(request):
@@ -243,7 +243,7 @@ def blog(request, slug, id):
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 ref = get_domain_from_url(
-                    request.META.get('HTTP_REFERER', None))
+                    request.META.get('HTTP_REFERER', ''))
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
                     view_key = View.create(
