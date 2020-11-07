@@ -18,7 +18,7 @@ from dscblog.settings import BASE_URL
 markdown_attrs['*'] += ['class']
 
 md = markdown.Markdown(
-    extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
+    extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite'])
 
 
 def convert_session_to_user(request):
