@@ -4,7 +4,21 @@
 html,body{
     background-color: white;
 }
-
+#be_header{
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(251, 251, 251);
+    z-index: 2;
+    position: fixed;
+    padding: 0rem 0.5rem;
+    border-bottom: solid thin rgba(0, 0, 0, 0.089);
+}
+#be_hd_space{
+    height: 3rem;
+}
 .CodeMirror {
 	min-height: 80vh;
 }

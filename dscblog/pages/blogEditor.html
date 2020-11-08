@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block title %}
+Edit: {{blog.title}} | DSC IEM Blogs
+{% endblock %}
 {% block root %}
 <link rel="stylesheet" type="text/css" href="/static/styles/header.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogEditor.css" />
@@ -6,17 +9,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <div>
-    <div id="header">
-        <div class="size-s base-regular ink-black trunc-long" style="padding-left: 0.5rem;">{{blog.title}}</div>
+    <div id="be_header">
+        <div class="size-s base-regular ink-black trunc-long">{{blog.title}}</div>
         <div id="hd_opts" class="hstack space-around">
             <a id="doneBtn" class="button rounded ink-blue" >Done</a>
         </div>
     </div>
-    <textarea name="content" id="editor" class="markdown">
-    {% autoescape on %}
-    {{blog.content }}
-    {% endautoescape %}
-</textarea>
+    <div id="be_hd_space"></div>
+    <textarea name="content" id="editor" class="markdown">{{blog.content|safe}}</textarea>
 </div>
 <br />
 <script>
@@ -30,7 +30,7 @@
     var unsavedContent=false;
     var saving=false;
     function save(content, willExit=false) {
-        if((new Date().getTime()-lastSave)>2000){
+        if((new Date().getTime()-lastSave)>2000 || willExit){
         if(!saving){
         saving=true
         api.post('blog/content/set', {
@@ -71,5 +71,18 @@
     document.getElementById("doneBtn").addEventListener("click", function()
         { save(editor.value().trim(),true);
     });
+
+    window.addEventListener("beforeunload", function (e) {
+    if(saving||unsavedContent){
+    var confirmationMessage = 'You have some unsaved changes. '
+                            + 'Please use the Done button to save and exit.';
+
+    (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+    return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+    }
+    else{
+        return null;
+    }
+});
 </script>
 {% endblock %}

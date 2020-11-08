@@ -238,7 +238,7 @@ def blog(request, slug, id):
                 htm = bleach.clean(md.reset().convert(
                     b.content), tags=markdown_tags+['dl'], attributes=markdown_attrs, styles=all_styles)
                 opts = {'header': {
-                    'is_loggedin': False, 'is_empty': True},
+                    'is_loggedin': False, 'is_empty': False},
                     'BASE_URL':BASE_URL,
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': htm,
@@ -296,7 +296,7 @@ def create(request):
             title = request.POST['title'].strip()
             if len(title) > 2:
                 b = Blog.create(request.user, title)
-                res = redirect(to='/blog/'+str(b.id)+'/settings')
+                res = redirect(to='/blog/'+str(b.id)+'/edit')
             else:
                 res = render(request, 'create.html', {
                              'error': 'Title too small (min 3 characters)'})

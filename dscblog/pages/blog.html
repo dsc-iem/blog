@@ -3,7 +3,7 @@
 {{blog.title}} | DSC IEM Blogs
 {% endblock %}
 {% block desc %}
-"{{blog.content|truncatewords:50}}"
+"{{blog.content|striptags|truncatewords:50}}"
 {% endblock %}
 {% block tags %}
 <script type="application/ld+json">
@@ -26,7 +26,7 @@
 <meta property="og:image" content="{{blog.img_url}}" >
 <meta property="og:url" content="{{BASE_URL}}{{blog.blog_url}}" />
 <meta property="og:type" content="website" />
-<meta property="og:og:description" content="{{blog.content|truncatewords:50}}" />
+<meta property="og:og:description" content="{{blog.content|striptags|truncatewords:50}}" />
 {% endblock %}
 {% block content %}
 <script src="/static/scripts/parallax.js"></script>
