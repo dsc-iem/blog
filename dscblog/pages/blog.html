@@ -1,6 +1,27 @@
 {% extends "base.html" %}
 {% block title %}
-{{blog.title}} - DSC IEM Blogs
+{{blog.title}} | DSC IEM Blogs
+{% endblock %}
+{% block desc %}
+"{{blog.content|truncatewords:50}}"
+{% endblock %}
+{% block tags %}
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{blog.title}}",
+        "author" : {
+            "@type" : "Person",
+            "name" : "{{blog.author.name}}"
+          },
+        "image": [
+          "{{blog.img_url}}"
+         ],
+        "datePublished": "{{blog.published_on|date:"c"}}",
+        "dateModified": "{{blog.modified_on|date:"c"}}"
+      }
+    </script>
 {% endblock %}
 {% block content %}
 <script src="/static/scripts/parallax.js"></script>

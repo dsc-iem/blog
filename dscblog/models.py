@@ -395,7 +395,7 @@ class Blog(models.Model):
 
     def get_obj_min(self):
         obj = {'title': self.title, 'img_url': self.img_url, 'blog_id': self.id, 'blog_url': self.get_url(),
-               'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
+               'is_published': self.is_published, 'modified_on': self.modified_on, 'published_on': self.published_on, 'author': self.author.get_profile_min()}
         return obj
 
     def get_obj(self, user=None, escape_html=False):
