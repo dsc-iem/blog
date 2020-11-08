@@ -1,6 +1,10 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/header.css" />
 {% if not blank %}
+{% if header.float %}
+<div id="header" class="float">
+{% else %}
 <div id="header">
+{% endif %}
     <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png" /></a>
     <div id="hd_opts" class="hstack space-around">
         {% if not header.is_empty %}
@@ -18,7 +22,9 @@
         
     </div>
 </div>
+{% if header.float %}
 <div id="hd_space"></div>
+{% endif %}
 {% endif %}
 <script>
     function systemTheme() {

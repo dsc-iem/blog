@@ -9,10 +9,16 @@ from dscblog.forms import UserSettingsForm
 import markdown
 import html
 from pyembed.markdown import PyEmbedMarkdown
+import bleach
+from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
+from urllib.parse import urlparse
+from dscblog.settings import BASE_URL
 
+
+markdown_attrs['*'] += ['class']
 
 md = markdown.Markdown(
-    extensions=['extra', 'markdown.extensions.codehilite', PyEmbedMarkdown()])
+    extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite'])
 
 
 def convert_session_to_user(request):
@@ -23,6 +29,12 @@ def convert_session_to_user(request):
             request.session['has_views'] = False
 
 
+def get_domain_from_url(url):
+    parsed_uri = urlparse(url)
+    result = '{uri.netloc}'.format(uri=parsed_uri)
+    return result
+
+
 def get_session(request):
     try:
         return Session.objects.get(session_key=request.session.session_key)
@@ -30,10 +42,24 @@ def get_session(request):
         return None
 
 
+def get_catagories(request):
+    user = None
+    session = None
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        session = get_session(request)
+    return User.get_catagories(user, session)
+
+
+def check_referer(request):
+    return render(request, 'referer.html', {'ref': get_domain_from_url(request.META.get('HTTP_REFERER', ''))})
+
+
 def index(request):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False}}
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'all'}
     opts['blogs'] = []
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
@@ -47,7 +73,7 @@ def index(request):
         opts['featured_blog'] = None
     else:
         opts['featured_blog'] = featured.get_obj_min()
-        opts['featured_blog']['intro'] = featured.content[:300]
+        opts['featured_blog']['intro'] = html.escape(featured.content[:300])
     res = render(request, 'index.html', opts)
     return res
 
@@ -55,7 +81,7 @@ def index(request):
 def top25(request):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False}}
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'popular'}
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
     opts['blogs'] = []
@@ -66,9 +92,70 @@ def top25(request):
     return res
 
 
+def new_blogs(request):
+    convert_session_to_user(request)
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'new'}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.recents()[:30]
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
+    res = render(request, 'new.html', opts)
+    return res
+
+
+def trending_blogs(request):
+    convert_session_to_user(request)
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': 'trending'}
+    if request.user.is_authenticated:
+        opts['header']['is_loggedin'] = True
+    opts['blogs'] = []
+    blogs = Blog.trending()[:30]
+    for b in blogs:
+        opts['blogs'].append(b.get_obj_min())
+    res = render(request, 'trending.html', opts)
+    return res
+
+
+def topic(request, topic):
+    _topic = topic.strip().lower().replace(" ", "")
+    if _topic == topic:
+        convert_session_to_user(request)
+        opts = {'header': {
+            'is_loggedin': False, 'is_empty': False}, 'cat': get_catagories(request), 'active_cat': topic}
+        if request.user.is_authenticated:
+            opts['header']['is_loggedin'] = True
+        opts['blogs'] = []
+        try:
+            t = Topic.get_by_name(topic)
+        except:
+            pass
+        else:
+            blogs = t.top_blogs()[:30]
+            for b in blogs:
+                opts['blogs'].append(b.get_obj_min())
+        res = render(request, 'topic.html', opts)
+        return res
+    else:
+        return redirect(to='/topic/'+_topic)
+
+
 @login_required
 def my_profile(request):
     return redirect(to='/@'+request.user.username)
+
+
+def cat(request, topic):
+    pages = ['popular', 'new', 'trending']
+    if topic == 'all':
+        return redirect(to='/')
+    elif topic in pages:
+        return redirect(to='/'+topic)
+    else:
+        return redirect(to='/topic/'+topic)
 
 
 def followers(request, username):
@@ -94,7 +181,7 @@ def blog_reactions(request, id):
         return page404(request)
     else:
         if request.user == b.author:
-            data = {'header': {'is_loggedin': True},
+            data = {'header': {'is_loggedin': True, 'float': True},
                     'users': [], 'blog': b.get_obj_min()}
             reactions = b.get_reactions()
             for reaction in reactions:
@@ -116,7 +203,7 @@ def user_settings(request):
     else:
         form = UserSettingsForm(instance=request.user)
     opts = {'header': {
-        'is_loggedin': True, 'is_empty': False},
+        'is_loggedin': True, 'is_empty': False, 'float': True},
         'form': form}
     return render(request, 'userSettings.html', opts)
 
@@ -124,7 +211,7 @@ def user_settings(request):
 def profile(request, username):
     convert_session_to_user(request)
     opts = {'header': {
-        'is_loggedin': False, 'is_empty': False},
+        'is_loggedin': False, 'is_empty': False, 'float': True},
         'is_owner': request.user.is_authenticated and request.user.username == username}
     if request.user.is_authenticated:
         opts['header']['is_loggedin'] = True
@@ -148,21 +235,28 @@ def blog(request, slug, id):
     else:
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
+                htm = bleach.clean(md.reset().convert(
+                    b.content), tags=markdown_tags+['dl'], attributes=markdown_attrs, styles=all_styles)
                 opts = {'header': {
-                    'is_loggedin': False, 'is_empty': True},
+                    'is_loggedin': False, 'is_empty': False},
+                    'BASE_URL':BASE_URL,
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
-                    'html': md.reset().convert(b.content),
+                    'html': htm,
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
+                ref = get_domain_from_url(
+                    request.META.get('HTTP_REFERER', ''))
                 if request.user.is_authenticated:
                     opts['header']['is_loggedin'] = True
-                    view_key = View.create(user=request.user, blog=b)
-                    opts['more_blogs']=b.related_blogs(user=request.user)
+                    view_key = View.create(
+                        user=request.user, blog=b, referer=ref)
+                    opts['more_blogs'] = b.related_blogs(user=request.user)
                 else:
                     request.session['has_views'] = True
                     view_key = View.create(
-                        user=None, blog=b, session=get_session(request))
-                    opts['more_blogs']=b.related_blogs(session=get_session(request))
+                        user=None, blog=b, session=get_session(request), referer=ref)
+                    opts['more_blogs'] = b.related_blogs(
+                        session=get_session(request))
                 opts['view_key'] = view_key
                 res = render(request, 'blog.html', opts)
                 return res
@@ -202,7 +296,7 @@ def create(request):
             title = request.POST['title'].strip()
             if len(title) > 2:
                 b = Blog.create(request.user, title)
-                res = redirect(to='/blog/'+str(b.id)+'/settings')
+                res = redirect(to='/blog/'+str(b.id)+'/edit')
             else:
                 res = render(request, 'create.html', {
                              'error': 'Title too small (min 3 characters)'})
@@ -220,7 +314,7 @@ def blog_settings(request, id):
         return page404(request)
     else:
         if request.user == b.author:
-            opts = {'header': {'is_loggedin': True, 'is_empty': False},
+            opts = {'header': {'is_loggedin': True, 'is_empty': False, 'float': True},
                     'blog': b.get_obj_min()}
             topics = []
             for topic in b.get_topics():
@@ -406,13 +500,17 @@ def add_blog_topic(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    topic = request.POST['topic'].strip().lower()
+                    topic = request.POST['topic'].strip(
+                    ).lower().replace(" ", "")
                     if len(topic) > 1:
-                        if not b.has_topic(topic):
-                            b.add_topic(topic)
-                            return apiRespond(201, topic=topic)
+                        if topic not in Topic.BANNED:
+                            if not b.has_topic(topic):
+                                b.add_topic(topic)
+                                return apiRespond(201, topic=topic)
+                            else:
+                                return apiRespond(400, msg='Topic already tagged')
                         else:
-                            return apiRespond(400, msg='Topic already tagged')
+                            return apiRespond(400, msg='This topic is disabled')
                     else:
                         return apiRespond(400, msg='Topic name too short')
                 else:
@@ -433,7 +531,8 @@ def remove_blog_topic(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    topic = request.POST['topic'].strip().lower()
+                    topic = request.POST['topic'].strip(
+                    ).lower().replace(" ", "")
                     if b.remove_topic(topic):
                         return apiRespond(201, topic=topic)
                     else:
@@ -540,8 +639,7 @@ def set_blog_content(request):
                 return apiRespond(400, msg='Blog not found')
             else:
                 if b.author == request.user:
-                    content = html.escape(
-                        request.POST['content']).replace('&gt;', '>')
+                    content = request.POST['content']
                     b.update_content(content)
                     return apiRespond(201)
                 else:

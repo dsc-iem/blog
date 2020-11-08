@@ -1,17 +1,22 @@
 {% extends "base.html" %}
 {% block title %}
-Popular blogs | DSC IEM Blogs
+#{{active_cat}} | DSC IEM Blogs
 {% endblock %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="/static/styles/explore.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
 {% include "blocks/catalogue.html"  %}
 <div class="container" id="s1">
-    <div id="s1_title" class="ink-primary">
-        Popular
-        <div class="size-m base-semilight ink-grey">Our top 25</div>
+    <div id="topic_title" class="ink-primary">
+        <div class="size-s base-semilight ink-grey" style="font-style: normal;">TOPIC</div>
+        <div style="line-height: 0.9em;">{{active_cat}}</div>
     </div>
-    
+    {% if blogs %}
     {% include "blocks/blogsGrid.html" with items=blogs  %}
+    {% else %}
+    <div class="center ink-grey base-regular size-l" style="min-height: 30vh;">
+        No posts yet
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

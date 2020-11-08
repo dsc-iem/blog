@@ -1,13 +1,57 @@
 {% extends "base.html" %}
 {% block title %}
-{{blog.title}} - DSC IEM Blogs
+{{blog.title}} | DSC IEM Blogs
+{% endblock %}
+{% block desc %}
+"{{blog.content|striptags|truncatewords:50}}"
+{% endblock %}
+{% block tags %}
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "{{blog.title}}",
+        "author" : {
+            "@type" : "Person",
+            "name" : "{{blog.author.name}}"
+          },
+        "image": [
+          "{{blog.img_url}}"
+         ],
+        "datePublished": "{{blog.published_on|date:"c"}}",
+        "dateModified": "{{blog.modified_on|date:"c"}}"
+      }
+</script>
+<meta property="og:title" content="{{blog.title}} | DSCIEM Blog" >
+<meta property="og:image" content="{{blog.img_url}}" >
+<meta property="og:url" content="{{BASE_URL}}{{blog.blog_url}}" />
+<meta property="og:type" content="website" />
+<meta property="og:og:description" content="{{blog.content|striptags|truncatewords:50}}" />
 {% endblock %}
 {% block content %}
 <script src="/static/scripts/parallax.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/styles/blog.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
-<link rel="stylesheet" type="text/css" href="/static/styles/emacs.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/monokai.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+<div id="b_head">
+    <div id="bhd_like"></div>
+    <div class="center" id="bhd_icon">
+    <a href="/"><img class="icon" style="font-size: 2.5rem;margin: 0px;" src="/static/icons/icon.png" /></a>    
+    </div>
+    <div id="bhd_share" class="center">
+        <a 
+        href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
+        class="share_link fb center">
+        <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/fb_share.png" />
+        </a>
+        <a class="share_link tw center" href="https://twitter.com/intent/tweet?text={{blog.title}}&url={{BASE_URL}}{{blog.blog_url}}">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/twitter_share.png" />
+        </a>
+        <a onclick="shareLink()" class="share_link link center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/link_share.png" /></a>
+        <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
+    </div>
+</div>
 <div class="b_img" data-parallax="scroll" data-speed="0.7" data-image-src="{{blog.img_url}}" >
 </div>
 <div class="container blog_opts">
@@ -44,14 +88,13 @@
 </div>
 <div class="markdown">
     <div class="size-xxl ink-primary base-regular blog-title">{{blog.title}}</div>
-    <br/>
     {% autoescape off %}
     {{html}}
     {% endautoescape %}
 </div>
 <div id="react_box" class="center">
     <div class="react" id="like">👍<div class="react_count" id="like_count">{{blog.reaction_counts.LIK}}</div></div>
-    <div class="react" id="love">❤<div class="react_count" id="love_count">{{blog.reaction_counts.LOV}}</div></div>
+    <div class="react" id="love" style="color: red;">❤<div class="react_count" id="love_count">{{blog.reaction_counts.LOV}}</div></div>
     <div class="react" id="lit">🔥<div class="react_count" id="lit_count">{{blog.reaction_counts.LIT}}</div></div>
     <div class="react" id="cool">🆒<div class="react_count" id="cool_count">{{blog.reaction_counts.COL}}</div></div>
     <div class="react" id="clap">👏<div class="react_count" id="clap_count">{{blog.reaction_counts.CLP}}</div></div>
@@ -72,9 +115,22 @@
 <br />
 <div class="center topics">
     {% for topic in blog.topics %}
-    <div class="topic ink-primary">#{{topic}}</div>
+    <a href="/topic/{{topic}}" class="topic ink-secondary">#{{topic}}</a>
     {% endfor %}
 </div>
+<br/>
+    <div class="center share_box">
+        <a 
+        href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
+        class="share_link fb center">
+        <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/fb_share.png" />
+        </a>
+        <a class="share_link tw center" href="https://twitter.com/intent/tweet?text={{blog.title}}&url={{BASE_URL}}{{blog.blog_url}}">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/twitter_share.png" />
+        </a>
+        <a onclick="shareLink()" class="share_link link center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/link_share.png" /></a>
+        <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
+    </div>
 <br/>
 <div class="container" id="more">
         <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
@@ -83,6 +139,52 @@
 </div>
 <br />
 <script>
+     var isFloating = false;
+    $(window).scroll(() => {
+        if (window.pageYOffset > 500) {
+            if (!isFloating) {
+                $("#b_head").addClass('float')
+                isFloating = true
+            }
+        } else {
+            if (isFloating) {
+                $("#b_head").removeClass('float')
+                isFloating = false
+            }
+        }
+    });
+    function shareLink(){
+        const clipText = window.location.href
+        var promise = navigator.clipboard.writeText(clipText).then(() => {
+                alert("Link copied to clipboard")
+            }, () => {
+                console.error("Failed to copy to clipboard")
+            });
+    }
+    function exportLink(){
+        const url = window.location.href
+        const shareData = {
+            title: '{{blog.title}}',
+            text: "{{blog.title}}",
+            url,
+        }
+        const clipText = url
+        if (navigator.share) {
+            // Web Share API is supported
+            window.navigator.share(shareData).then(() => {
+                console.log("Link shared")
+            })
+                .catch((e) => {
+                    console.error(e)
+                });
+        } else {
+            var promise = navigator.clipboard.writeText(clipText).then(() => {
+                alert("Link copied to clipboard")
+            }, () => {
+                console.error("Failed to copy to clipboard")
+            });
+        }
+    }
     const REACTS={
     'LIK':'like',
     'LOV':'love',
@@ -160,6 +262,6 @@
         if(pingbacks<=30){
             ping()
         }
-    },20000)
+    },22000)
 </script>
 {% endblock %}

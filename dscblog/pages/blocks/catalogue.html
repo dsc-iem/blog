@@ -1,0 +1,30 @@
+<link rel="stylesheet" type="text/css" href="/static/styles/catalogue.css" />
+<div id="catalogue" class="center">
+    {% for item in cat %}
+    {% if item == active_cat %}
+    <a class="cat active">
+        {{item}}
+    </a>
+    {% else %}
+    <a href="/cat/{{item}}" class="cat clickable">
+        {{item}}
+    </a>
+    {% endif %}
+    {% endfor %}
+</div>
+<script>
+    var isFloating = false;
+    $(window).scroll(() => {
+        if (window.pageYOffset > 60) {
+            if (!isFloating) {
+                $("#catalogue").addClass('float')
+                isFloating = true
+            }
+        } else {
+            if (isFloating) {
+                $("#catalogue").removeClass('float')
+                isFloating = false
+            }
+        }
+    });
+</script>

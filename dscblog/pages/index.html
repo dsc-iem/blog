@@ -3,6 +3,7 @@
 <script src="/static/scripts/parallax.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/styles/index.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+{% include "blocks/catalogue.html"  %}
 {% if featured_blog %}
 <div class="ft_img" data-parallax="scroll" data-speed="0.5" data-image-src="{{featured_blog.img_url}}">
 </div>
@@ -12,7 +13,7 @@
     <div class="ink-grey size-s base-regular">SPOTLIGHT</div>
     <div class="ink-secondary size-xl base-semibold ft_title" >{{featured_blog.title}}</div>
     <div class="container ink-grey size-s base-semilight ft_intro">
-        <div>{{featured_blog.intro}}...</div>
+        <div>{{featured_blog.intro|striptags}}...</div>
         <a href="{{featured_blog.blog_url}}" 
         style="padding-top: 0.6rem;" class="size-xs base-regular ink-primary clickable">
             Continue reading >

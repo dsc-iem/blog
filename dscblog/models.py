@@ -216,6 +216,25 @@ class User(AbstractUser):
         return comments_feed
 
     @classmethod
+    def get_catagories(cls, user=None, session=None):
+        topics = []
+        if user != None:
+            topics = list(user.get_top_topics()[:5])
+        elif session != None:
+            topics = list(get_top_topics_of_session(session)[:5])
+        if len(topics) < 5:
+            for topic in Topic.top_topics():
+                if topic not in topics:
+                    topics.append(topic)
+                if len(topics) >= 5:
+                    break
+        # random.shuffle(topics)
+        names = []
+        for topic in topics:
+            names.append(topic.name)
+        return ['all', 'popular', 'new', 'trending']+names
+
+    @classmethod
     def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None):
         top_topics = init_topics
         posts = []
@@ -348,8 +367,8 @@ class Follower(models.Model):
 
 
 class Blog(models.Model):
-    title = models.CharField(max_length=60, verbose_name='Title')
-    img_url = models.CharField(max_length=150, null=True, default=None)
+    title = models.CharField(max_length=200, verbose_name='Title')
+    img_url = models.CharField(max_length=200, null=True, default=None)
     content = models.CharField(
         max_length=20000, verbose_name='Content', default='')
     author = models.ForeignKey(
@@ -376,10 +395,10 @@ class Blog(models.Model):
 
     def get_obj_min(self):
         obj = {'title': self.title, 'img_url': self.img_url, 'blog_id': self.id, 'blog_url': self.get_url(),
-               'is_published': self.is_published, 'modified_on': self.modified_on, 'author': self.author.get_profile_min()}
+               'is_published': self.is_published, 'modified_on': self.modified_on, 'published_on': self.published_on, 'author': self.author.get_profile_min()}
         return obj
 
-    def get_obj(self, user=None, escape_html=True):
+    def get_obj(self, user=None, escape_html=False):
         obj = self.get_obj_min()
         obj['content'] = self.content
         obj['reaction_counts'] = self.get_reaction_counts()
@@ -392,8 +411,8 @@ class Blog(models.Model):
             react_obj = self.get_user_reaction(user)
             if react_obj != None:
                 obj['user_reaction'] = react_obj.reaction
-        if not escape_html:
-            obj['content'] = html.unescape(obj['content'])
+        if escape_html:
+            obj['content'] = html.escape(obj['content'])
         return obj
 
     def get_comments_count(self):
@@ -524,17 +543,20 @@ class Blog(models.Model):
 
     @classmethod
     def recent4(cls):
-        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')[:4]
+        return cls.objects.filter(is_published=True).order_by('-published_on')[:4]
 
     @classmethod
     def recents(cls):
-        return cls.objects.filter(is_published=True).order_by('-modified_on', '-published_on')
+        return cls.objects.filter(is_published=True).order_by('-published_on')
 
     def __str__(self):
         return str(self.id)+'. '+self.title
 
 
 class Topic(models.Model):
+    BANNED = ['all', 'trending', 'new', 'recents', 'feed', 'recent', 'feeds', 'recommended',
+              'recommendation', 'read', 'latest', 'newpost', 'new-post', 'comment',
+              'popular', 'hot', 'top', 'blog', 'blogging', 'cool', 'like', 'likes']
     name = models.CharField(
         max_length=30, verbose_name='Name', primary_key=True)
     created_on = models.DateTimeField()
@@ -554,7 +576,7 @@ class Topic(models.Model):
                 ))).order_by('engagement_recency', '-score', '-published_on')
 
     def recent_blogs(self):
-        return self.blogs.filter(is_published=True).order_by('-modified_on', '-published_on')
+        return self.blogs.filter(is_published=True).order_by('-published_on')
 
     @classmethod
     def get_by_name(cls, name):
@@ -598,6 +620,9 @@ class Topic(models.Model):
     def top_topics(cls):
         return cls.objects.annotate(score=Sum('blogs__score')).order_by('-score', '-created_on')
 
+    def __str__(self):
+        return self.name
+
 
 class View(models.Model):
     user = models.ForeignKey(
@@ -606,6 +631,8 @@ class View(models.Model):
         Session, related_name="viewed",  on_delete=models.SET_NULL, null=True, default=None)
     blog = models.ForeignKey(
         Blog, related_name="views", on_delete=models.CASCADE)
+    referer = models.CharField(
+        max_length=400, verbose_name='Referer Site', null=True, default=None)
     score = models.FloatField(verbose_name='Engagement Score', default=1.0)
     date = models.DateTimeField()
     key = models.CharField(max_length=30, verbose_name='Key')
@@ -636,7 +663,7 @@ class View(models.Model):
         return self.pingbacks
 
     @classmethod
-    def create(cls, user, blog, session=None):
+    def create(cls, user, blog, session=None, referer=None):
         try:
             existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
             )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
@@ -652,7 +679,7 @@ class View(models.Model):
                 score = 0.1
             blog.addScore(score)
             obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
-                      last_pingback_date=timezone.now(), score=score, key=makecode())
+                      last_pingback_date=timezone.now(), score=score, key=makecode(), referer=referer)
             obj.save()
             return obj.key
         else:

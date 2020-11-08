@@ -5,6 +5,18 @@
   justify-content: space-between;
   align-items: center;
   background-color: rgba(235, 235, 235, 0.329);
+  z-index: 2;
+}
+#hd_space{
+  height: 3rem;
+}
+#header.float{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 [data-theme="dark"] #header {
   background-color: rgba(0, 0, 0, 0.329);
