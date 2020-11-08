@@ -21,7 +21,12 @@
         "datePublished": "{{blog.published_on|date:"c"}}",
         "dateModified": "{{blog.modified_on|date:"c"}}"
       }
-    </script>
+</script>
+<meta property="og:title" content="{{blog.title}} | DSCIEM Blog" >
+<meta property="og:image" content="{{blog.img_url}}" >
+<meta property="og:url" content="{{BASE_URL}}{{blog.blog_url}}" />
+<meta property="og:type" content="website" />
+<meta property="og:og:description" content="{{blog.content|truncatewords:50}}" />
 {% endblock %}
 {% block content %}
 <script src="/static/scripts/parallax.js"></script>
