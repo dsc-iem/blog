@@ -109,13 +109,14 @@
   background-color: rgba(0, 183, 255, 0.753);
   color: var(--bg);
 }
-#topics {
+.topics {
   padding: 0rem 0.6rem;
   flex-direction: row;
   flex-wrap: wrap;
-  max-width: 22rem;
-  align-items: flex-start;
   margin: 0px auto;
+  align-items: flex-start;
+  width: 95vw;
+  max-width: 35rem;
 }
 .topic {
   margin: 0.3rem;
