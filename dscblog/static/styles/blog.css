@@ -1,7 +1,12 @@
+[data-theme="dark"] body{
+  background-color: #323232;
+}
 .blog-title {
   padding: 0.5rem 0px;
   line-height: normal;
-  padding-bottom: 1.5rem;
+  padding-bottom: 2rem;
+  font-weight: 300;
+  font-size: 2em;
 }
 .author-info {
   width: 35em;
@@ -163,7 +168,7 @@
   display: flex;
 }
 [data-theme="dark"] #b_head {
-  background-color: rgba(0, 0, 0, 0.466);
+  background-color: rgba(26, 26, 26, 0.466);
   box-shadow: none;
 }
 .share_link {
