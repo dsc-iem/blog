@@ -7,7 +7,7 @@
   width: 35em;
   max-width: 100%;
   margin: 0 auto;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 .blog-author {
   width: fit-content;
@@ -27,6 +27,10 @@
 }
 .blog_opts {
   max-width: 34em;
+  margin-top: 2rem;
+}
+.hd_opt {
+  color: white !important;
 }
 .b_img {
   width: 100%;
@@ -211,6 +215,9 @@
     display: none;
   }
   #bhd_share .share_link.export {
+    display: flex;
+  }
+  #bhd_share .share_link.edit {
     display: flex;
   }
 }

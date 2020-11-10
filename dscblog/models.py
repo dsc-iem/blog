@@ -400,6 +400,7 @@ class Blog(models.Model):
 
     def get_obj(self, user=None, escape_html=False):
         obj = self.get_obj_min()
+        obj['views_count'] = self.get_views_count()
         obj['content'] = self.content
         obj['reaction_counts'] = self.get_reaction_counts()
         obj['comments_count'] = self.get_comments_count()
@@ -498,6 +499,9 @@ class Blog(models.Model):
         for topic in self.get_topics():
             topics.append(topic)
         return User.feed_from_top_topics(user, session, topics, self)[:6]
+
+    def get_views_count(self):
+        return View.objects.filter(blog=self).count()
 
     @classmethod
     def create(cls, author, title):
@@ -664,28 +668,32 @@ class View(models.Model):
 
     @classmethod
     def create(cls, user, blog, session=None, referer=None):
-        try:
-            existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
-            )-datetime.timedelta(minutes=5)).order_by('-last_pingback_date')[0]
-        except:
-            score = 0.1
-            prev = cls.objects.filter(user=user, blog=blog, session=session)
-            prev_count = prev.count()
-            if prev_count == 0:
-                score = 0.5
-            elif prev_count <= 5:
-                score = 0.3
-            else:
+        if user != blog.author:
+            try:
+                existing = cls.objects.filter(user=user, blog=blog, session=session, last_pingback_date__gte=timezone.now(
+                )-datetime.timedelta(minutes=10)).order_by('-last_pingback_date')[0]
+            except:
                 score = 0.1
-            blog.addScore(score)
-            obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
-                      last_pingback_date=timezone.now(), score=score, key=makecode(), referer=referer)
-            obj.save()
-            return obj.key
+                prev = cls.objects.filter(
+                    user=user, blog=blog, session=session)
+                prev_count = prev.count()
+                if prev_count == 0:
+                    score = 0.5
+                elif prev_count <= 5:
+                    score = 0.3
+                else:
+                    score = 0.1
+                blog.addScore(score)
+                obj = cls(user=user, blog=blog, date=timezone.now(), session=session,
+                          last_pingback_date=timezone.now(), score=score, key=makecode(), referer=referer)
+                obj.save()
+                return obj.key
+            else:
+                existing.last_pingback_date = timezone.now()
+                existing.save()
+                return existing.key
         else:
-            existing.last_pingback_date = timezone.now()
-            existing.save()
-            return existing.key
+            return None
 
     @classmethod
     def get_active(cls, user, blog, session=None):

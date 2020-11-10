@@ -117,14 +117,14 @@
     margin-top: 0.2rem;
 }
 .bi_opt{
-    display: block;
+    display: flex;
     background-color: var(--tertiary);
     height: 1.8rem;
     font-size: 0.9rem;
     font-weight: 500;
     min-width: 1.8rem;
-    padding: 0.3rem 0.5rem;
-    border-radius: 0.8rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 2rem;
     cursor: pointer;
     margin-right: 0.6rem;
     -webkit-user-select: none;

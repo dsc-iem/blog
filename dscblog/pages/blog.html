@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load numbers %}
 {% block title %}
 {{blog.title}} | DSC IEM Blogs
 {% endblock %}
@@ -35,11 +36,18 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/monokai.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
 <div id="b_head">
-    <div id="bhd_like"></div>
+    <div id="bhd_like">
+        {% if is_owner %}
+        <a href="/blog/{{blog.blog_id}}/settings" class="share_link settings center">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/settings.png" />
+        </a>
+        {% endif %}
+    </div>
     <div class="center" id="bhd_icon">
-    <a href="/"><img class="icon" style="font-size: 2.5rem;margin: 0px;" src="/static/icons/icon.png" /></a>    
+    <a href="/"><img class="icon" style="font-size: 2.35rem;margin: 0px;" src="/static/icons/icon.png" /></a>    
     </div>
     <div id="bhd_share" class="center">
+        {% if blog.is_published %}
         <a 
         href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
         class="share_link fb center">
@@ -50,25 +58,36 @@
         </a>
         <a onclick="shareLink()" class="share_link link center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/link_share.png" /></a>
         <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
+        {% else %}
+        <a href="/blog/{{blog.blog_id}}/edit" class="share_link edit center">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/edit.png" />
+        </a>
+        <a href="/blog/{{blog.blog_id}}/settings" class="share_link settings center">
+            <img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/settings.png" />
+        </a>
+        {% endif %}
     </div>
 </div>
 <div class="b_img" data-parallax="scroll" data-speed="0.7" data-image-src="{{blog.img_url}}" >
 </div>
 <div class="container blog_opts">
-{% if is_owner %}
-<br/>
 <div class="hstack space-between bi_opts">
+    <div class="hstack">
     {% if not blog.is_published %}
-    <div>
         <img class="bi_locked" alt="locked" src="/static/icons/locked.png" />
-    </div>
     {% endif %}
+    <div class="bi_opt center" style="font-size: 0.8rem;">
+        <img class="icon" style="font-size: 1rem; margin: 0px; margin-right: 0.5rem;" alt="views count" src="/static/icons/eye.png" />
+        {{blog.views_count|compact}}
+    </div>
+    </div>
+    {% if is_owner %}
     <div style="display:flex">
         <a href="/blog/{{blog.blog_id}}/edit" class="bi_opt center">Edit</a>
         <a href="/blog/{{blog.blog_id}}/settings" class="bi_opt center">Settings</a>
     </div>
+    {% endif %} 
 </div>
-{% endif %}    
 </div>
 <div class="hstack container author-info">
     <div>
@@ -108,7 +127,7 @@
 <br/>
 <div class="center-col">
     <a href="/blog/{{blog.blog_id}}/comments" id="comments_button" class="size-s base-regular ink-blue" >
-        {{blog.comments_count}} Comments
+        {{blog.comments_count|compact}} Comments
     </a>
 </div>
 <br />
@@ -119,6 +138,7 @@
     {% endfor %}
 </div>
 <br/>
+{% if blog.is_published %}
     <div class="center share_box">
         <a 
         href="https://www.facebook.com/sharer.php?caption={{blog.title}}&u={{BASE_URL}}{{blog.blog_url}}&picture={{blog.img_url}}" 
@@ -132,6 +152,7 @@
         <a onclick="exportLink()" class="share_link export center"><img class="icon" style="font-size: 1rem;margin: 0px;" src="/static/icons/export_share.png" /></a>
     </div>
 <br/>
+{% endif %}
 <div class="container" id="more">
         <div style="padding-left: 1.5rem;" class="size-m base-semilight ink-grey">Keep reading</div>
     <hr/>
@@ -258,10 +279,13 @@
             }
         }) 
     }
-    window.setInterval(()=>{
+    if(view_key!='None' && view_key!=null){
+        window.setInterval(()=>{
         if(pingbacks<=30){
             ping()
         }
     },22000)
+    }
+    
 </script>
 {% endblock %}
