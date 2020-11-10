@@ -173,7 +173,7 @@ p code {
 }
 
 [data-theme="dark"] p code {
-  background-color: rgb(53, 53, 53);
+  background-color: rgb(39, 39, 39);
 }
 
 p var {
