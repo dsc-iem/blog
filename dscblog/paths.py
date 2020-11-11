@@ -17,6 +17,8 @@ from dscblog.settings import BASE_URL
 
 markdown_attrs['*'] += ['class']
 
+md_tags = markdown_tags+['dl','table','thead','tr','th','tbody','td']
+
 md = markdown.Markdown(
     extensions=['extra', 'fenced_code', 'markdown.extensions.codehilite'])
 
@@ -236,7 +238,7 @@ def blog(request, slug, id):
         if b.get_slug() == slug:
             if b.is_published or (request.user.is_authenticated and request.user == b.author):
                 htm = bleach.clean(md.reset().convert(
-                    b.content), tags=markdown_tags+['dl'], attributes=markdown_attrs, styles=all_styles)
+                    b.content), tags=md_tags, attributes=markdown_attrs, styles=all_styles)
                 opts = {'header': {
                     'is_loggedin': False, 'is_empty': False},
                     'BASE_URL':BASE_URL,
