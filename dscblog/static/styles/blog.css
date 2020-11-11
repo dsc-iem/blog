@@ -145,11 +145,10 @@
   z-index: 2;
   overflow: hidden;
   justify-content: space-between;
-  background-color: rgba(246, 246, 246, 0.61);
+  background-color: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   height: 3rem;
-  box-shadow: 0px 2px 11px 2px #00000012;
   align-items: center;
 }
 #bhd_icon {
@@ -168,7 +167,7 @@
   display: flex;
 }
 [data-theme="dark"] #b_head {
-  background-color: rgba(26, 26, 26, 0.466);
+  background-color: rgba(50, 50, 50, 78%);
   box-shadow: none;
 }
 .share_link {
