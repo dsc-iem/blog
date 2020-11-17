@@ -225,3 +225,6 @@
     display: flex;
   }
 }
+.twitter-tweet{
+  margin: 20px auto !important;
+}
