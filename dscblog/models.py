@@ -321,13 +321,15 @@ class User(AbstractUser):
         cat = {'cat': 'trending', 'title': 'Trending', 'blogs': []}
         for post in trending_feed:
             cat['blogs'].append(post.get_obj_min())
-        cats.append(cat)
+        if len(cat['blogs']):
+            cats.append(cat)
         cats += cls.feed_from_top_topics(usr, session, group=True)
         cat = {'cat': 'new', 'title': 'New arrivals', 'blogs': []}
         recents_feed = Blog.recents()[:5]
         for post in recents_feed:
             cat['blogs'].append(post.get_obj_min())
-        cats.append(cat)
+        if len(cat['blogs']):
+            cats.append(cat)
         random.shuffle(posts)
         return {'feed': posts, 'cats': cats}
 
