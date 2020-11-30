@@ -57,3 +57,18 @@ padding-top: 2rem;
 .hd_opt{
     color:white !important;
 }
+.cat-title{
+    max-width: 60.5rem;
+    margin: 0px auto;
+    margin-bottom: 0.6rem;
+    display: block;
+    width: 100%;
+    padding-left: 0.5rem;
+}
+.cat-title:hover{
+    color:rgba(129, 129, 129, 0.774);
+    padding-left: 1.2rem;
+    transition-property: all;
+    transition-delay: 0.2s;
+    transition-duration: 0.6s;
+}

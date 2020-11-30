@@ -235,10 +235,11 @@ class User(AbstractUser):
         return ['all', 'popular', 'new', 'trending']+names
 
     @classmethod
-    def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None):
+    def feed_from_top_topics(cls, user=None, session=None, init_topics=[], xcept=None, group=False):
         top_topics = init_topics
         posts = []
         blogs = []
+        grps = []
         if user != None:
             for topic in user.get_top_topics()[:7]:
                 if topic not in top_topics:
@@ -256,24 +257,34 @@ class User(AbstractUser):
                     break
         random.shuffle(top_topics)
         for topic in top_topics:
+            grp = {'cat': topic.name, 'title': topic.name, 'blogs': []}
             counter = 0
             for blog in topic.top_blogs():
                 if blog not in blogs and blog != xcept:
                     counter += 1
                     blogs.append(blog)
-                    obj = blog.get_obj_min()
-                    obj['highlight'] = {'type': 'TOPIC',
-                                        'text': topic.name}
-                    posts.append(obj)
-                if counter >= 3:
+                    if not group:
+                        obj = blog.get_obj_min()
+                        obj['highlight'] = {'type': 'TOPIC',
+                                            'text': topic.name}
+                        posts.append(obj)
+                    else:
+                        grp['blogs'].append(blog.get_obj_min())
+                if counter >= 4:
                     break
-            if len(posts) >= 12:
+            if group and len(grp['blogs']):
+                grps.append(grp)
+            if len(posts) >= 12 or len(grps) >= 5:
                 break
+        if group:
+            return grps
         return posts
 
     @classmethod
     def get_feed(cls, usr=None, session=None):
         posts = []
+        post_ids=[]
+        cats = []
         if usr != None:
             author_feed = usr.get_author_feed()[:5]
             for post in author_feed:
@@ -290,41 +301,35 @@ class User(AbstractUser):
                     if ind != len(comment['users'])-1:
                         txt += ', '
                 obj['highlight'] = {'type': 'COMMENT',
-                                    'text': txt+' commented'}
+                                    'text': txt+' commented on this'}
                 posts.append(obj)
             likes_feed = usr.get_likes_feed(5)
             for reaction in likes_feed:
                 obj = reaction['blog'].get_obj_min()
                 txt = ''
-                for ind, user in enumerate(comment['users']):
+                for ind, user in enumerate(reaction['users']):
                     txt += user.get_name()
-                    if ind != len(comment['users'])-1:
+                    if ind != len(reaction['users'])-1:
                         txt += ', '
                 obj['highlight'] = {'type': 'LIKE',
-                                    'text': txt+' liked'}
+                                    'text': txt+' liked this'}
                 posts.append(obj)
         if len(posts) >= 15:
             trending_feed = Blog.trending()[:5]
         else:
             trending_feed = Blog.trending()[:10]
+        cat = {'cat': 'trending', 'title': 'Trending', 'blogs': []}
         for post in trending_feed:
-            obj = post.get_obj_min()
-            obj['highlight'] = {'type': 'TRENDING', 'text': 'Trending'}
-            posts.append(obj)
-        psts = cls.feed_from_top_topics(usr, session)
-        for post in psts:
-            posts.append(post)
-        if len(posts) < 25:
-            if len(posts) <= 10:
-                recents_feed = Blog.recents()[:10]
-            else:
-                recents_feed = Blog.recents()[:5]
-            for post in recents_feed:
-                obj = post.get_obj_min()
-                obj['highlight'] = {'type': 'NEW', 'text': 'Recently added'}
-                posts.append(obj)
+            cat['blogs'].append(post.get_obj_min())
+        cats.append(cat)
+        cats += cls.feed_from_top_topics(usr, session, group=True)
+        cat = {'cat': 'new', 'title': 'New arrivals', 'blogs': []}
+        recents_feed = Blog.recents()[:5]
+        for post in recents_feed:
+            cat['blogs'].append(post.get_obj_min())
+        cats.append(cat)
         random.shuffle(posts)
-        return posts
+        return {'feed': posts, 'cats': cats}
 
     @classmethod
     def get_by_id(cls, pk):

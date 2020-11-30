@@ -25,6 +25,13 @@
 <br/>
 {% endif %}
 <div class="container" id="s1">
-    {% include "blocks/blogsGrid.html" with items=blogs  %}
+    {% include "blocks/blogsGrid.html" with items=blogs.feed  %}
 </div>
+{% for catagory in blogs.cats %}
+<div class="container">
+<a class="cat-title ink-secondary base-light size-l" href="/cat/{{catagory.cat}}">{{catagory.title}} <span class="ink-tertiary">></span></a>
+{% include "blocks/blogsGrid.html" with items=catagory.blogs  %}
+</div>
+<div style="height: 0.6rem;"></div>
+{% endfor %}
 {% endblock %}
