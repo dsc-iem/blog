@@ -4,20 +4,21 @@
 }
 
 [data-theme="dark"] .markdown {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-[data-theme="dark"] hr{
-border-color: rgb(63, 63, 63);
+[data-theme="dark"] hr {
+  border-color: rgb(63, 63, 63);
 }
 
 .markdown {
   /* TEXT PARENT */
-  width: 35em;
+  width: 40em;
   max-width: 100%;
   padding: 1.2rem;
   margin: 0 auto;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu;
   line-height: 1.6;
   font-size: 16pt;
   font-weight: 300;
@@ -316,9 +317,10 @@ ul ul {
 
 .markdown img {
   display: block;
-  width: 100%;
-  margin: 1rem 0rem;
+  margin: 1rem auto;
+  max-width: 100%;
   border-radius: 0.8rem;
+  height: auto;
 }
 
 .markdown figure {
