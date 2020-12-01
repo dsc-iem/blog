@@ -9,7 +9,8 @@
   font-size: 2em;
 }
 .author-info {
-  width: 35em;
+  font-size: 16pt;
+  width: 40em;
   max-width: 100%;
   margin: 0 auto;
   margin-top: 1.5rem;
@@ -31,7 +32,8 @@
   color: var(--primary);
 }
 .blog_opts {
-  max-width: 34em;
+  font-size: 16pt;
+  max-width: 40em;
   margin-top: 2rem;
 }
 .hd_opt {
