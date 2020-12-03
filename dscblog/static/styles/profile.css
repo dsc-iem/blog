@@ -15,10 +15,9 @@ padding-top: 2rem;
 }
 #s3{
     padding: 1rem 0.3rem;
-    font-size: 1rem;
-    color: var(--grey);
-    font-weight: 400;
     max-width: 28rem;
+    margin: 0.6rem auto;
+    margin-left: 7rem;
 }
 #followers_count{
     padding-right: 1rem;
@@ -63,6 +62,7 @@ padding-top: 2rem;
         justify-content: center;
         align-items: center;
         text-align: center;
+        margin-left: auto;
     }
 }
 @media(max-width:600px){

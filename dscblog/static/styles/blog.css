@@ -1,27 +1,41 @@
+body{
+  background-color:#f2f2f2;
+}
 [data-theme="dark"] body{
-  background-color: #323232;
+  background-color:#323232;
+}
+.wavy-line{
+  border: none;
+    height: 6px;
+    background: currentColor;
+    mask-image: url(/static/media/wavy.svg);
+    -webkit-mask-image: url(/static/media/wavy.svg);
+    opacity: .75;
+    margin: 2em 0;
+}
+.ab-box{
+  max-width: 40rem;
+}
+.ab-author{
+display: flex;
+align-items: center;
 }
 .blog-title {
   padding: 0.5rem 0px;
   line-height: normal;
   padding-bottom: 2rem;
-  font-weight: 300;
-  font-size: 2em;
+  font-weight: 600;
+  font-family: "Basic Sans", basic-sans, "Helvetica Neue", helvetica, arial,
+  sans-serif;
 }
 .author-info {
-  font-size: 16pt;
-  width: 40em;
+  font-size: 18px;
+  width: 50em;
   max-width: 100%;
   margin: 0 auto;
   margin-top: 1.5rem;
 }
-.blog-author {
-  width: fit-content;
-  display: block;
-  padding-left: 0rem;
-  text-decoration: none;
-  margin-bottom: 0.2rem;
-}
+
 .author_avatar {
   font-size: 2.6rem;
   margin: 0.3rem;
@@ -32,12 +46,12 @@
   color: var(--primary);
 }
 .blog_opts {
-  font-size: 16pt;
-  max-width: 40em;
+  font-size: 18px;
+  max-width: 50em;
   margin-top: 2rem;
 }
-.hd_opt {
-  color: white !important;
+#header {
+  border-bottom: none;
 }
 .b_img {
   width: 100%;
@@ -77,7 +91,7 @@
 .react {
   margin: 0.4rem 0.5rem;
   padding: 0.4rem 0.6rem;
-  background-color: rgb(238, 238, 238);
+  background-color: rgb(255, 255, 255);
   border-radius: 0.3rem;
   display: flex;
   justify-content: center;
@@ -147,7 +161,7 @@
   z-index: 2;
   overflow: hidden;
   justify-content: space-between;
-  background-color: rgba(255, 255, 255, 0.78);
+  background-color:rgba(242, 242, 242, 0.822);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   height: 3rem;

@@ -54,9 +54,9 @@ padding-top: 2rem;
     top:0px;
     z-index: 1;
 }
-.hd_opt{
-    color:white !important;
-}
+#header {
+    border-bottom: none;
+  }
 .cat-title{
     max-width: 60.5rem;
     margin: 0px auto;

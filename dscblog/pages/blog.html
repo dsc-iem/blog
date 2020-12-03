@@ -35,6 +35,7 @@
 <link rel="stylesheet" type="text/css" href="/static/styles/md.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/monokai.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/blogsGrid.css" />
+<link rel="stylesheet" href="https://use.typekit.net/apw7exh.css">
 <div id="b_head">
     <div id="bhd_like">
         {% if is_owner %}
@@ -89,27 +90,25 @@
     {% endif %} 
 </div>
 </div>
-<div class="hstack container author-info">
-    <div>
-        {% if blog.author.avatar_url %}
-        <a href="/@{{ blog.author.username }}">
-            <img class="icon author_avatar" src="{{ blog.author.avatar_url }}" />
-        </a>
-        {% endif %}
-    </div>
-    <div>
+<div class="container author-info ink-grey">
+        <div class="size-xs base-light">AUTHOR</div>
         <div onclick="openLink('/@{{blog.author.username}}')" 
-        class="size-s ink-secondary base-regular blog-author clickable">
+        class="size-s ink-orange base-regular clickable">
         {% include "blocks/name.html" with user=blog.author %}
         </div>
-        <div class="size-xs base-light ink-grey">{{blog.modified_on}}</div> 
-    </div>
 </div>
 <div class="markdown">
-    <div class="ink-primary blog-title">{{blog.title}}</div>
+    <div class="ink-primary blog-title size-xxl">
+        {{blog.title}}
+        <div class="size-xs base-light ink-grey">{{blog.published_on|date:"D d M Y"}}</div>
+    </div>
     {% autoescape off %}
     {{html}}
     {% endautoescape %}
+    <br/>
+    {% if blog.modified_on != blog.published_on %}
+    <div class="size-xs base-light ink-grey">Last updated on: {{blog.modified_on}}</div>
+    {% endif %}
 </div>
 <div id="react_box" class="center">
     <div class="react" id="like">👍<div class="react_count" id="like_count">{{blog.reaction_counts.LIK}}</div></div>
@@ -131,7 +130,26 @@
     </a>
 </div>
 <br />
+<div class="container ab-box">
+ <hr class="wavy-line">
+ <div class="ink-grey base-regular size-s" style="padding: 0.5rem; padding-top: 0;">AUTHOR</div>
+ <div class="ab-author">
+        {% if blog.author.avatar_url %}
+        <a href="/@{{ blog.author.username }}">
+            <img class="icon author_avatar size-s" src="{{ blog.author.avatar_url }}" />
+        </a>
+        {% endif %}
+    <span onclick="openLink('/@{{blog.author.username}}')" 
+    class="size-l ink-secondary base-semibold clickable">
+    {% include "blocks/name.html" with user=blog.author %}
+</span>
+ </div>
+ <div class="ink-grey base-regular size-xs" style="padding-left: 0.6rem;">
+    {{author_bio}}
+ </div>
+</div>
 <br />
+<br/>
 <div class="center topics">
     {% for topic in blog.topics %}
     <a href="/topic/{{topic}}" class="topic ink-secondary">#{{topic}}</a>
