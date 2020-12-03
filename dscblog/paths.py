@@ -54,6 +54,13 @@ def get_catagories(request):
     return User.get_catagories(user, session)
 
 
+def page_loader(request, **args):
+    opts = {'header': {
+        'is_loggedin': False, 'is_empty': True}}
+    res = render(request, args['page']+'.html', opts)
+    return res
+
+
 def check_referer(request):
     return render(request, 'referer.html', {'ref': get_domain_from_url(request.META.get('HTTP_REFERER', ''))})
 

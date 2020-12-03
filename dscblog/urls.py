@@ -29,7 +29,8 @@ urlpatterns = [
     path('trending', paths.trending_blogs),
     path('topic/<str:topic>', paths.topic),
     path('login', RedirectView.as_view(url='/accounts/login', permanent=True)),
-    path('None', RedirectView.as_view(url='/static/media/none.png', permanent=True)),
+    path('None', RedirectView.as_view(
+        url='/static/media/none.png', permanent=True)),
     path('explore', RedirectView.as_view(url='/', permanent=True)),
     path('cat/<str:topic>', paths.cat),
     path('<slug:slug>,<int:id>/', paths.blog, name='blog'),
@@ -60,6 +61,8 @@ urlpatterns = [
     path('api/blog/comment', paths.blog_comment),
     path('api/blog/uncomment', paths.blog_uncomment),
     path('api/blog/pingback', paths.pingback),
+    path('info/privacy', paths.page_loader, {'page': 'info/privacy'}),
+    path('info/terms', paths.page_loader, {'page': 'info/terms'}),
 ]
 
 handler404 = 'dscblog.paths.page404'
