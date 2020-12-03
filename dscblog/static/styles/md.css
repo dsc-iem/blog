@@ -1,6 +1,5 @@
 .markdown {
-  font-size: 20px;
-  color: #303030;
+  color: #331e3e;
 }
 
 [data-theme="dark"] .markdown {
@@ -13,14 +12,12 @@
 
 .markdown {
   /* TEXT PARENT */
-  width: 40em;
+  width: 50em;
   max-width: 100%;
   padding: 1.2rem;
   margin: 0 auto;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Ubuntu;
-  line-height: 1.6;
-  font-size: 16pt;
+  font-family: ff-tisa-web-pro, "Basic Sans", basic-sans, georgia, serif;
+  font-size: 18px;
   font-weight: 300;
   text-align: center;
   overflow: hidden;
@@ -36,55 +33,45 @@ h3,
 h4,
 h5,
 h6 {
-  margin: 0;
-  padding: 0;
+  font-family: "Basic Sans", basic-sans, "Helvetica Neue", helvetica, arial,
+    sans-serif;
+  margin-bottom: 0;
 }
 
 h1 {
-  display: block;
-  font-size: 2em;
-  margin-block-start: 0.67em;
-  margin-block-end: 0.67em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
-  border-bottom: solid thin var(--tertiary);
+  font-size: 3.5rem;
+  margin-bottom: .3em;
+}
+
+@media screen and (max-width: 960px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  h1 {
+    margin-block-start: 0.5em;
+  }
 }
 
 h2 {
-  display: block;
-  font-size: 1.5em;
-  margin-block-start: 0.83em;
-  margin-block-end: 0.83em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  font-weight: bold;
+  font-size: 2rem;
+  margin-bottom: .2em;
+}
+
+@media screen and (max-width: 960px) {
+  h2 {
+    font-size: 1.8rem;
+  }
 }
 
 h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: 400;
-  font-size: 1.75rem;
+  font-size: 1.45rem;
 }
 
 h4 {
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  font-size: 1.5rem;
-}
-
-h5 {
-  margin-top: 1rem;
-  font-weight: 700;
-  font-size: 1.25rem;
-}
-
-h6 {
-  margin-top: 1rem;
-  font-weight: 700;
-  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 p {
@@ -170,7 +157,7 @@ pre::-webkit-scrollbar-thumb {
 }
 p code {
   padding: 0 0.2em 0.1em;
-  background-color: #eee;
+  background-color: rgb(212, 212, 212);
 }
 
 [data-theme="dark"] p code {
@@ -210,7 +197,6 @@ blockquote {
   font-size: 1.2rem;
   font-style: italic;
   font-weight: 400;
-  line-height: 1.5;
   overflow: hidden;
 }
 [data-theme="dark"] blockquote {
@@ -250,8 +236,6 @@ abbr[title] {
 }
 
 ul {
-  list-style: none;
-  margin-left: -1.3em;
   padding-left: 2em;
 }
 
@@ -260,7 +244,6 @@ ul > li {
 }
 
 ul > li::before {
-  content: "»";
   display: block;
   position: relative;
   height: 0;

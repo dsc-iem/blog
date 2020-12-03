@@ -251,6 +251,7 @@ def blog(request, slug, id):
                     'BASE_URL':BASE_URL,
                     'blog': b.get_obj(user=request.user if request.user.is_authenticated else None),
                     'html': htm,
+                    'author_bio': b.author.bio,
                     'more_blogs': [],
                     'is_owner': request.user.is_authenticated and request.user == b.author}
                 ref = get_domain_from_url(

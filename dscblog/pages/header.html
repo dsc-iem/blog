@@ -8,16 +8,16 @@
     <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png" /></a>
     <div id="hd_opts" class="hstack space-around">
         {% if not header.is_empty %}
-        <a class="hd_opt hd_canhide" href="/explore">Explore</a>
+        <a class="hd_opt hd_canhide btn btn-bordered" href="/explore">Explore</a>
         {% if header.is_loggedin %}
-        <a class="hd_opt" href="/create">Write</a>
-        <a class="hd_opt" href="/profile">Profile</a>
+        <a class="hd_opt btn btn-bordered" href="/create">Write</a>
+        <a class="hd_opt btn btn-bordered" href="/profile">Profile</a>
         {% else %}
-        <a class="hd_opt" href="/accounts/login">Log In</a>
+        <a class="hd_opt btn btn-bordered" href="/accounts/login">Log In</a>
         {% endif %}
         {% endif %}
         <div id="hd_toggleBox">
-            <div id="hd_themeToggle">☀</div>
+            <div id="hd_themeToggle" class="btn btn-bordered">☀</div>
         </div>
         
     </div>

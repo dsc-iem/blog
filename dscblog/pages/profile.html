@@ -15,7 +15,7 @@
             {% endif %}
         <div id="s1_txt">
             {% if user.name %}
-            <div id="s1_title" class="ink-primary base-light">
+            <div id="s1_title" class="ink-primary base-semibold">
                 {{user.name}}
             </div>
             {% endif %}
@@ -27,14 +27,14 @@
             {{user.followers_count}} followers
         </a>
         {% if user.is_self %}
-        <a class="button rounded" href="/userSettings">Settings</a>
+        <a class="btn" href="/userSettings">Settings</a>
         {% else %}
-        <div class="button rounded" style="display: none;" id="unfollow">Unfollow</div>
-        <div class="button blue ink-white rounded" id="follow">Follow</div>
+        <div class="btn btn-bordered" style="display: none;" id="unfollow">Unfollow</div>
+        <div class="btn follow-btn" id="follow">Follow</div>
         {% endif %}
     </div>
     {% if user.bio %}
-    <div id="s3">{{user.bio}}</div>
+    <div id="s3" class="ink-grey base-regular size-xs">{{user.bio}}</div>
     {% endif %}
     <hr />
     <br/>

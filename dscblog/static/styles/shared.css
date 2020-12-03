@@ -1,6 +1,9 @@
 body{
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  transition-property: 'background-color';
+  transition-duration: 0.4s;
+  font-family: "Basic Sans", basic-sans, "Helvetica Neue", helvetica, arial, sans-serif;
 }
 #bg {
   height: 100%;
@@ -50,16 +53,35 @@ button[type=submit]{
   padding: 0.5rem;
   width: 100%;
   margin: 0.8rem 0.3rem;
-  background: rgb(0, 119, 255);
-  color:white;
+  background:rgb(0, 255, 179);
+  color:rgb(0, 0, 0);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 600;
   border-radius: 0.2rem;
   width: 17rem;
   max-width: 85vw;
+  border:solid thin rgb(48, 48, 48);
+  cursor: pointer;
+  user-select: none;
+  transition: all;
+  transition-duration: 0.2s;
+  box-shadow: 3px 3px 0px #0e5f44;
 }
 button[type=submit]:hover{
-  background: rgb(0, 153, 255);
+  background: rgb(0, 202, 125);
+  box-shadow: 5px 6px 0px #0e5f44;
+}
+[data-theme="dark"] button[type=submit]{
+  border:solid thin rgb(0, 255, 162);
+  color:rgb(0, 255, 162);
+  background: rgb(0, 94, 59);
+  box-shadow: 3px 3px 0px #419075;
+}
+[data-theme="dark"] button[type=submit]:hover{
+  border:solid thin rgb(0, 255, 162);
+  color:rgb(0, 68, 43);
+  background: rgb(0, 199, 126);
+  box-shadow: 5px 6px 0px #116d4e;
 }
 input {
   -webkit-appearance: none;
@@ -70,19 +92,19 @@ input {
   width: 17rem;
   max-width: 85vw;
   height: 2.6rem;
-  background-color: rgb(233, 233, 233);
+  background-color: rgb(240, 240, 240);
   color: rgb(75, 75, 75);
-  border: solid thin rgb(199, 199, 199);
+  border: solid thin rgb(32, 32, 32);
   margin: 0.3rem 0.3rem;
   border-radius: 0.3rem;
   outline: none;
 }
 @keyframes focus{
-  0% { box-shadow: 0 0 8px 9px #51a5ff50;}
-  100% { box-shadow: 0 0 3px 4px #007cff63;}
+  0% { box-shadow: 0 0 8px 9px rgba(96, 255, 194, 0.308);}
+  100% { box-shadow: 0 0 3px 4px rgba(0, 202, 125, 0.534);}
 }
 input:focus {
-  box-shadow: 0 0 3px 4px #007cff63;
+  box-shadow: 0 0 3px 4px rgba(0, 202, 125, 0.534);
   animation-name: focus;
   animation-duration: 350ms;
   animation-direction: alternate-reverse;
@@ -90,7 +112,7 @@ input:focus {
 [data-theme="dark"] input{
   background-color: rgb(36, 36, 36);
   color: rgb(211, 211, 211);
-  border: solid thin rgb(44 44 44);
+  border: solid thin rgb(224, 224, 224);
 }
 input[type=checkbox]{
   -webkit-appearance: checkbox;
@@ -121,7 +143,7 @@ textarea {
   max-width: 85vw;
   background-color: rgb(233, 233, 233);
   color: rgb(75, 75, 75);
-  border: solid thin rgb(199, 199, 199);
+  border: solid thin rgb(41, 41, 41);
   margin: 0.3rem 0.3rem;
   border-radius: 0.3rem;
   outline: none;
@@ -129,7 +151,7 @@ textarea {
 [data-theme="dark"] textarea{
   background-color: rgb(36, 36, 36);
   color: rgb(211, 211, 211);
-  border: solid thin rgb(44 44 44);
+  border: solid thin rgb(221, 221, 221);
 }
 .errorlist{
   list-style: none;
@@ -191,4 +213,50 @@ textarea {
   margin-top: 20px;
 }
 
-
+.btn{
+  font-size: 15px;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  background-color: rgb(224, 224, 224);
+  border-radius: 0.2rem;
+  border:solid thin rgb(85, 85, 85);
+  cursor: pointer;
+  user-select: none;
+  transition: all;
+  transition-duration: 0.2s;
+}
+.btn:hover{
+  background-color: rgb(102, 102, 102);
+  color: rgb(221, 221, 221);
+}
+[data-theme="dark"] .btn{
+  background-color: rgb(48, 48, 48);
+  border-color:rgb(197, 197, 197);
+}
+[data-theme="dark"] .btn:hover{
+  background-color: rgb(201, 201, 201);
+  color: rgb(51, 51, 51);
+}
+.follow-btn{
+  background-color: rgb(0, 255, 64);
+}
+.follow-btn:hover{
+  background-color: rgb(15, 207, 63);
+  color:rgb(0, 0, 0);
+}
+[data-theme="dark"] .follow-btn{
+  background-color: rgb(0, 100, 25);
+  border-color:rgb(0, 255, 76);
+  color:#00ff4c;
+}
+[data-theme="dark"] .follow-btn:hover{
+  background-color: rgb(15, 207, 63);
+  color:rgb(0, 0, 0);
+}
+.btn-bordered{
+  font-weight: 300;
+  background-color:transparent;
+}
+[data-theme="dark"] .btn-bordered{
+  background-color:transparent;
+}
