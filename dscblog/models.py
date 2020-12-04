@@ -12,7 +12,7 @@ import html
 import datetime
 import random
 
-MIN_TRENDING_SCORE = 5
+MIN_TRENDING_SCORE = 4
 
 
 def get_top_topics_of_session(session):
@@ -537,7 +537,7 @@ class Blog(models.Model):
                     ExpressionWrapper(timezone.now(
                     )-F('views__date'), output_field=models.DurationField())
                 )).filter(is_published=True,
-                          engagement_recency__lte=datetime.timedelta(days=3), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
+                          engagement_recency__lte=datetime.timedelta(days=25), score__gte=MIN_TRENDING_SCORE).order_by('engagement_recency', '-score')
 
     @classmethod
     def by_recent_engagement(cls):
