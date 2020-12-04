@@ -1,7 +1,7 @@
 body{
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
-  transition-property: 'background-color';
+  transition-property: all;
   transition-duration: 0.4s;
   font-family: "Basic Sans", basic-sans, "Helvetica Neue", helvetica, arial, sans-serif;
 }

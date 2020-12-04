@@ -4,7 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(235, 235, 235, 0.329);
+  background-color: rgba(219, 219, 219, 0.54);
   z-index: 2;
   border-bottom: solid thin;
 }
@@ -20,8 +20,7 @@
   -webkit-backdrop-filter: blur(20px);
 }
 [data-theme="dark"] #header {
-  background-color: rgba(0, 0, 0, 0.329);
-  border-bottom: none;
+  background-color: rgba(55, 55, 55, 0.56);
 }
 #hd_hero {
   padding: 0.3rem 0.6rem;
