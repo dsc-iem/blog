@@ -7,8 +7,17 @@
 {% endif %}
     <a id="hd_hero" href="/"><img id="hd_icon" src="/static/icons/icon.png" /></a>
     <div id="hd_opts" class="hstack space-around">
+        <div class="hamburger-wrapper" id="hamburger-button">
+            <a class="dash-wrapper hd_opt btn btn-bordered">
+                <div class="dash"></div>
+                <div class="dash"></div>
+                <div class="dash"></div>
+            </a>
+            <div class="main-content">
         {% if not header.is_empty %}
-        <a class="hd_opt hd_canhide btn btn-bordered" href="/explore">Explore</a>
+        <a class="hd_opt btn btn-bordered" href="/explore">Explore</a>
+        <a class="hd_opt btn btn-bordered hd_desktop_hide" href="/trending">Trending</a>
+        <a class="hd_opt btn btn-bordered hd_desktop_hide" href="/popular">Popular</a>
         {% if header.is_loggedin %}
         <a class="hd_opt btn btn-bordered" href="/create">Write</a>
         <a class="hd_opt btn btn-bordered" href="/profile">Profile</a>
@@ -16,6 +25,8 @@
         <a class="hd_opt btn btn-bordered" href="/accounts/login">Log In</a>
         {% endif %}
         {% endif %}
+            </div>
+        </div>
         <div id="hd_toggleBox">
             <div id="hd_themeToggle" class="btn btn-bordered">☀</div>
         </div>
@@ -52,4 +63,21 @@
             $("#hd_themeToggle").html("🌜");
         }
     })
+    
+    // Hamburger Click Event
+    $('#hamburger-button').on('click', () => {
+        const $elem = $('#hamburger-button');
+        const $mainContent = $('.main-content', $elem);
+        const activeClass = 'active';
+        if ($elem.hasClass(activeClass)) {
+            $elem.removeClass(activeClass);
+            $mainContent.fadeTo(0);
+            $('body').css('overflow', 'scroll');
+        } else {
+            $elem.addClass(activeClass);
+            $mainContent.fadeTo(1);
+            $('body').css('overflow', 'hidden');
+        }
+    });
+
 </script>
