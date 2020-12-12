@@ -665,6 +665,20 @@ def set_blog_content(request):
         return apiRespond(401, msg='User not logged in')
 
 
+@require_http_methods(["POST"])
+def get_new_alerts(request):
+    if request.user.is_authenticated:
+        try:
+            new_alerts = Alert.get_new_alerts(request.user)
+            old_alerts = Alert.get_old_alerts(request.user)
+        except:
+            return apiRespond(400, msg=f'Something went wrong.')
+        else:
+            return apiRespond(201, new_alerts=new_alerts, old_alerts=old_alerts)
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
 def page404(request, exception=None):
     response = render(request, '404.html')
     response.status_code = 404
