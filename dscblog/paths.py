@@ -679,6 +679,23 @@ def get_new_alerts(request):
         return apiRespond(401, msg='User not logged in')
 
 
+@require_http_methods(["POST"])
+def set_alerts_seen(request):
+    if request.user.is_authenticated:
+        if 'alerts_id' in request.POST:
+            try:
+                is_success = Alert.mark_group_seen(request.POST['alerts_id'].split(','))
+            except:
+                return apiRespond(400, msg=f'Something went wrong.')
+            else:
+                if is_success:
+                    return apiRespond(201, msg='Success')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
 def page404(request, exception=None):
     response = render(request, '404.html')
     response.status_code = 404

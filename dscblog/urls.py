@@ -62,6 +62,7 @@ urlpatterns = [
     path('api/blog/uncomment', paths.blog_uncomment),
     path('api/blog/pingback', paths.pingback),
     path('api/alerts/new', paths.get_new_alerts),
+    path('api/alerts/seen', paths.set_alerts_seen),
     path('info/privacy', paths.page_loader, {'page': 'info/privacy'}),
     path('info/terms', paths.page_loader, {'page': 'info/terms'}),
 ]
