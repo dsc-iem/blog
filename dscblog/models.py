@@ -102,7 +102,7 @@ class User(AbstractUser):
         except:
             return False
         else:
-            return True
+            return True, follow_obj
 
     def unfollow(self, target):
         try:
@@ -897,9 +897,9 @@ class Alert(models.Model):
 
         if user.id != ref_user.id:
             cls.check_for_max_limit(user)
-            obj = cls(user=user, ref_user=ref_user, type=type, blog=blog, comment=comment, reaction=reaction,
+            obj = cls.objects.update_or_create(user=user, ref_user=ref_user, type=type, blog=blog, comment=comment, reaction=reaction,
                       follow=follow)
-            obj.save()
+            # obj.save()
 
     # This function is used to generate and delete the new blog alert for followed user
     @classmethod
