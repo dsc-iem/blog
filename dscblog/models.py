@@ -166,7 +166,8 @@ class User(AbstractUser):
         try:
             obj = Comment.create(user=self, blog=blog,
                                  text=text, reference=reference)
-        except:
+        except Exception as e:
+            print('ERROR', e)
             return None
         else:
             return obj
@@ -283,7 +284,7 @@ class User(AbstractUser):
     @classmethod
     def get_feed(cls, usr=None, session=None):
         posts = []
-        post_ids=[]
+        post_ids = []
         cats = []
         if usr != None:
             author_feed = usr.get_author_feed()[:5]
@@ -714,7 +715,7 @@ class View(models.Model):
         except:
             return False
         else:
-            view.add_score(val)
+            view.addScore(val)
             return True
 
     @classmethod
@@ -777,7 +778,7 @@ class Reaction(models.Model):
                       reaction=reaction, date=timezone.now())
             obj.save()
             blog.addScore(cls.SCORE)
-            View.addScore(user, blog, cls.SCORE)
+            View.add_score(user, blog, cls.SCORE)
             return obj
         else:
             existing.reaction = reaction
@@ -824,15 +825,15 @@ class Comment(models.Model):
         if user != blog.author:
             if reference:
                 blog.addScore(0.4)
-                View.addScore(user, blog, 0.4)
+                View.add_score(user, blog, 0.4)
             else:
                 # First comment of the user
                 if user.commented.filter(blog=blog).count() <= 1:
                     blog.addScore(0.5)
-                    View.addScore(user, blog, 0.5)
+                    View.add_score(user, blog, 0.5)
                 else:
                     blog.addScore(0.3)
-                    View.addScore(user, blog, 0.3)
+                    View.add_score(user, blog, 0.3)
         else:
             blog.addScore(0.1)
         return obj
