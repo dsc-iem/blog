@@ -43,6 +43,13 @@
                 <div id="no-alerts">No new notifications found.</div>
             </div>
         </div>
+                <div id="floating-alert-wrapper" class="alerts-wrapper">
+                 <div class="floating-alert alert">
+                    <div class="main-content">
+                       You have new notifications. Click here to check it out!
+                    </div>
+                 </div>
+                </div>
         {% endif %}
         <div id="hd_toggleBox">
             <div id="hd_themeToggle" class="btn btn-bordered">☀</div>
@@ -108,6 +115,7 @@
             hideNotifications();
         } else {
             $notificationWrapper.addClass('active');
+            removeFloatingAlert();
         }
     });
 
@@ -140,7 +148,10 @@
     const fetchNewAlerts = () => {
         new Api().post('alerts/new', {}, (code, res) => {
                 if (code === 201) {
+                    alertsData = res;
                     populate_alerts(res);
+                    // Trigger Floating Alert if user does not see new alert
+                    setTimeout(() => addFloatingAlert(), 20000);
                 } else if (code === 400) {
                     populate_alerts({});
                     alert(res.msg);
@@ -193,6 +204,22 @@
             $('#no-alerts').show();
         }
 
+    };
+
+    $('.floating-alert', '#floating-alert-wrapper').click(() => {
+                removeFloatingAlert();
+                setTimeout(() => $('#notification-bell').click(), 500);
+    });
+
+    const addFloatingAlert = () => {
+        if(alertsData.new_alerts && alertsData.new_alerts.length) {
+            $('.floating-alert', '#floating-alert-wrapper').addClass('show');
+            setTimeout(() => removeFloatingAlert(), 15000);
+        }
+    };
+
+    const removeFloatingAlert = () => {
+        $('.floating-alert', '#floating-alert-wrapper').removeClass('show');
     };
     {% if header.is_loggedin %}
     fetchNewAlerts();
