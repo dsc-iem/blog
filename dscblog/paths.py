@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from dscblog.common import to_json, apiRespond
 from django.contrib.sessions.models import Session
-from dscblog.models import User, Blog, Featured, Reaction, Comment, View, Topic
+from dscblog.models import User, Blog, Featured, Reaction, Comment, View, Topic, Alert
 from dscblog.forms import UserSettingsForm
 import markdown
 import html
@@ -373,7 +373,8 @@ def follow_user(request):
             except:
                 return apiRespond(400, msg='Target user not found')
             else:
-                result = request.user.follow(target)
+                result, obj = request.user.follow(target)
+                Alert.create_alert(user=target, ref_user=request.user, type=Alert.FOLLOW, follow=obj)
                 return apiRespond(201, result=result)
         else:
             return apiRespond(400, msg='Required fields missing')
@@ -409,6 +410,7 @@ def blog_react(request):
                 return apiRespond(400, msg='Target blog not found')
             else:
                 obj = request.user.react(blog=b, reaction=reaction)
+                Alert.create_alert(ref_user=request.user, blog=b, type=Alert.REACTION, reaction=obj)
                 return apiRespond(201, result=True)
         else:
             return apiRespond(400, msg='Required fields missing')
@@ -451,6 +453,7 @@ def blog_comment(request):
             else:
                 comment = request.user.comment(
                     blog=b, text=request.POST['text'].strip(), reference=ref)
+                Alert.create_alert(ref_user=request.user, user=ref.user if ref else None, type=Alert.COMMENT_REPLY if ref else Alert.COMMENT, blog=b, comment=comment)
                 return apiRespond(201, comment=comment.get_obj())
         else:
             return apiRespond(400, msg='Required fields missing')
@@ -590,6 +593,7 @@ def publish_blog(request):
             else:
                 if b.author == request.user:
                     b.publish()
+                    Alert.alerts_for_new_blog(blog=b)
                     return apiRespond(201, is_published=b.is_published)
                 else:
                     return apiRespond(400, msg='Access denied')
@@ -610,6 +614,7 @@ def unpublish_blog(request):
             else:
                 if b.author == request.user:
                     b.unpublish()
+                    Alert.alerts_for_new_blog(blog=b, delete=True)
                     return apiRespond(201, is_published=b.is_published)
                 else:
                     return apiRespond(400, msg='Access denied')
@@ -654,6 +659,37 @@ def set_blog_content(request):
                     return apiRespond(201)
                 else:
                     return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def get_new_alerts(request):
+    if request.user.is_authenticated:
+        try:
+            new_alerts = Alert.get_new_alerts(request.user)
+            old_alerts = Alert.get_old_alerts(request.user)
+        except:
+            return apiRespond(400, msg=f'Something went wrong.')
+        else:
+            return apiRespond(201, new_alerts=new_alerts, old_alerts=old_alerts)
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def set_alerts_seen(request):
+    if request.user.is_authenticated:
+        if 'alerts_id' in request.POST:
+            try:
+                is_success = Alert.mark_group_seen(request.POST['alerts_id'].split(','))
+            except:
+                return apiRespond(400, msg=f'Something went wrong.')
+            else:
+                if is_success:
+                    return apiRespond(201, msg='Success')
         else:
             return apiRespond(400, msg='Required fields missing')
     else:
