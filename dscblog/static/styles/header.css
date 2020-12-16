@@ -228,7 +228,7 @@
   .hd_desktop_hide{
     display: block;
   }
-  .hstack{
+  #hd_opts{
     flex-direction: row-reverse;
   }
   .hamburger-wrapper{

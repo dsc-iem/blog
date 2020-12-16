@@ -189,7 +189,7 @@
         else{
             $('#old-alerts').hide();
         }
-        if(!res.new_alerts && !res.old_alerts){
+        if(!res.new_alerts.length && !res.old_alerts.length){
             $('#no-alerts').show();
         }
 

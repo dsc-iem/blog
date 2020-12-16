@@ -949,20 +949,20 @@ class Alert(models.Model):
         info = {}
         for alert in alerts:
             if alert.type == cls.FOLLOW:
-                grouped_alerts.append({'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.name}</a> started '
-                                                f'following you.', 'timestamp': alert.timestamp, 'id': alert.pk})
+                grouped_alerts.append({'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> started '
+                                                f'following you', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif alert.type == cls.NEW_BLOG:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.name}</a> posted a new blog <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> posted a new blog <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.COMMENT:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.name}</a> commented on <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>:"{alert.comment.text}".', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> commented on <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>: "{alert.comment.text}"', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.COMMENT_REPLY:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.name}</a> replied to your comment:"{alert.comment.reference.text}" on <a href="{alert.blog.get_url()}"> "{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> replied to your comment: "{alert.comment.reference.text}" on <a href="{alert.blog.get_url()}"> "{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.REACTION:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.name}</a> reacted {cls.map_reaction_type_to_emoji(alert.reaction.reaction)} to <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> reacted {cls.map_reaction_type_to_emoji(alert.reaction.reaction)} to <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
             else:
                 key = alert.blog.pk
                 if key not in blogs:
