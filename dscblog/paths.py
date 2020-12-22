@@ -625,6 +625,46 @@ def unpublish_blog(request):
 
 
 @require_http_methods(["POST"])
+def subscribe_blog(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    b.subscribe()
+                    return apiRespond(201, is_subscribe=b.is_subscribed)
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def unsubscribe_blog(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    b.unsubscribe()
+                    return apiRespond(201, is_subscribe=b.is_subscribed)
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
 def delete_blog(request):
     if request.user.is_authenticated:
         if 'blog_id' in request.POST:

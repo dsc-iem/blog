@@ -60,6 +60,8 @@ urlpatterns = [
     path('api/blog/unreact', paths.blog_unreact),
     path('api/blog/comment', paths.blog_comment),
     path('api/blog/uncomment', paths.blog_uncomment),
+    path('api/blog/subscribe', paths.subscribe_blog),
+    path('api/blog/unsubscribe', paths.unsubscribe_blog),
     path('api/blog/pingback', paths.pingback),
     path('api/alerts/new', paths.get_new_alerts),
     path('api/alerts/seen', paths.set_alerts_seen),
