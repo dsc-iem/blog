@@ -910,7 +910,7 @@ class Alert(models.Model):
         if type == cls.COMMENT or type == cls.REACTION:
             user = Blog.objects.get(pk=blog.pk).author
 
-        if user.id != ref_user.id:
+        if user.id != ref_user.id and (blog and blog.is_subscribed):
             cls.check_for_max_limit(user)
             obj = cls.objects.update_or_create(user=user, ref_user=ref_user, type=type, blog=blog, comment=comment, reaction=reaction,
                       follow=follow)
