@@ -33,9 +33,14 @@
     </div>
     <div class="hstack space-between opt">
         <div class="ink-grey size-s base-regular">Public</div>
-        <div id="toggle"></div>
+        <div id="publishToggle"></div>
     </div>
     <br/>
+    <div class="hstack space-between opt">
+        <div class="ink-grey size-s base-regular">Alerts</div>
+        <div id="subscribeToggle"></div>
+    </div>
+    <br />
     <hr/>
     <div class="center">
         <div id="delete" class="ink-red clickable">Delete blog</div>
@@ -55,7 +60,7 @@
     </div>
 </div>
 <script>
-    var toggle=toggleSwitch("toggle",(isActive)=>{
+    var publishToggle=toggleSwitch("publishToggle",(isActive)=>{
         var willActivate=!isActive
         if(willActivate!=is_published){
             if(willActivate){
@@ -66,11 +71,23 @@
             }
         }
     })
+    var subscribeToggle=toggleSwitch("subscribeToggle",(isActive)=>{
+        var willActivate = !isActive
+        if(willActivate!==is_subscribed){
+            if(willActivate){
+                subscribe();
+            }
+            else{
+                unsubscribe();
+            }
+        }
+    })
     var api = new window.Api();
     const blog_id = {{blog.blog_id}}
     var is_published = '{{blog.is_published}}'
     var title = '{{blog.title}}'
     var img_url = '{{blog.img_url}}'
+    var is_subscribed = '{{blog.is_subscribed}}'
     {% autoescape off %}
     var topics = JSON.parse('{{blog.topics}}')
     {% endautoescape %}
@@ -79,10 +96,20 @@
     else
         is_published = false;
 
+    if(is_subscribed === 'True')
+        is_subscribed = true;
+    else
+        is_subscribed = false;
+
     function renderPublishButton() {
-        toggle(is_published)
+        publishToggle(is_published)
     }
     renderPublishButton()
+    function renderSubUnsubButton() {
+        subscribeToggle(is_subscribed);
+    }
+    renderSubUnsubButton();
+
     function publish () {
         api.post('blog/publish', {
             blog_id
@@ -111,6 +138,37 @@
             }
         })
     }
+
+    function subscribe () {
+        api.post('blog/subscribe', {
+            blog_id
+        }, (code, res) => {
+            if (code == 201) {
+                is_subscribed = true;
+                renderSubUnsubButton()
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login";
+            }
+        })
+    };
+
+    function unsubscribe () {
+        api.post('blog/unsubscribe', {
+            blog_id
+        }, (code, res) => {
+            if (code == 201) {
+                is_subscribed = false;
+                renderSubUnsubButton();
+            } else if (code == 400) {
+                alert(res.msg);
+            } else if (code == 401) {
+                window.location.href = "/login";
+            }
+        })
+    };
+
     $("#titleSave").on('click', () => {
         api.post('blog/title/set', {
             blog_id,

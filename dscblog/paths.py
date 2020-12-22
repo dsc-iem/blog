@@ -324,8 +324,10 @@ def blog_settings(request, id):
         return page404(request)
     else:
         if request.user == b.author:
+            blog_opts = b.get_obj_min()
+            blog_opts['is_subscribed'] = b.is_subscribed
             opts = {'header': {'is_loggedin': True, 'is_empty': False, 'float': True},
-                    'blog': b.get_obj_min()}
+                    'blog': blog_opts}
             topics = []
             for topic in b.get_topics():
                 topics.append(topic.name)
