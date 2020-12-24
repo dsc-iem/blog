@@ -217,12 +217,14 @@
 
     const addFloatingAlert = () => {
         if(alertsData.new_alerts && alertsData.new_alerts.length) {
-            $('.floating-alert', '#floating-alert-wrapper').addClass('show');
+            $('.floating-alert').css({'display':'flex'})
+            setTimeout(() => $('.floating-alert', '#floating-alert-wrapper').addClass('show'), 1);
             setTimeout(() => removeFloatingAlert(), 15000);
         }
     };
 
     const removeFloatingAlert = () => {
+        setTimeout(() => $('.floating-alert').css({'display':'none'}), 1000);
         $('.floating-alert', '#floating-alert-wrapper').removeClass('show');
     };
     {% if header.is_loggedin %}

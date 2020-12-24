@@ -229,7 +229,7 @@
   overflow: hidden;
 }
 #floating-alert-wrapper .floating-alert{
-  display: flex;
+  display: none;
   flex-direction: row;
   background: var(--tertiary);
   border-radius: 9px;
@@ -244,7 +244,7 @@
 }
 #floating-alert-wrapper .floating-alert .main-content{
   margin: 1rem;
-  width: 21rem;
+  width: 18rem;
   text-align: left;
   -webkit-user-select: none;
   user-select: none;
