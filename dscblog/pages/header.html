@@ -46,7 +46,8 @@
                 <div id="floating-alert-wrapper" class="alerts-wrapper">
                  <div class="floating-alert alert">
                     <div class="main-content">
-                       You have new notifications. Click here to check it out!
+                       You have new notifications. 
+                       <div class="ink-grey base-light" style="font-size: 0.8rem;">Click here to check it out!</div>
                     </div>
                  </div>
                 </div>
@@ -208,7 +209,10 @@
 
     $('.floating-alert', '#floating-alert-wrapper').click(() => {
                 removeFloatingAlert();
-                setTimeout(() => $('#notification-bell').click(), 500);
+                setTimeout(() => {
+                    window.scrollTo(0,0);
+                    $('#notification-bell').click();
+                    }, 500);
     });
 
     const addFloatingAlert = () => {
