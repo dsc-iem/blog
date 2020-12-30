@@ -1,0 +1,172 @@
+{% load inlinecss %}
+{% inlinecss "styles/email.css" %}
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1.0, user-scalable=0">
+  <title>{% block title %}DSC-IEM Blog{% endblock %}</title>
+  <style type="text/css">
+    a {
+      color: inherit;
+      font-weight: 500;
+    }
+
+    @media only screen and (max-width: 550px),
+    screen and (max-device-width: 550px) {
+      body[yahoo] .hide {
+        display: none !important;
+      }
+
+      body[yahoo] .buttonwrapper {
+        background-color: transparent !important;
+      }
+
+      body[yahoo] .button {
+        padding: 0px !important;
+      }
+
+      body[yahoo] .button a {
+        background-color: #e05443;
+        padding: 15px 15px 13px !important;
+      }
+
+      body[yahoo] .unsubscribe {
+        display: block;
+        margin-top: 20px;
+        padding: 10px 50px;
+        background: #4e5f6d;
+        border-radius: 5px;
+        text-decoration: none !important;
+        font-weight: bold;
+      }
+    }
+
+    /*@media only screen and (min-device-width: 601px) {
+    .content {width: 600px !important;}
+    .col425 {width: 425px!important;}
+    .col380 {width: 380px!important;}
+    }*/
+  </style>
+</head>
+
+<body yahoo bgcolor="#f6f8f1">
+  <table width="100%" bgcolor="#f6f8f1" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td>
+        <!--[if (gte mso 9)|(IE)]>
+      <table width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+    <![endif]-->
+        <table bgcolor="#ffffff" class="content" align="center" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#badbd4" class="header">
+              {% if user %}
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="ink-black size-l base-semibold" style="padding-bottom: 20px;">Hi
+                    {% if user.name %}
+                    {{user.name}},
+                    {% else %}
+                    {{user.username}},
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+              {% endif %}
+              <table width="160" align="left" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td height="60" style="padding: 0 20px 0 0;">
+                    <img class="fix" src="{{BASE_URL}}/static/icons/icon.png" width="160" height="60" border="0"
+                      alt="" />
+                  </td>
+                </tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+            <table width="425" align="left" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+          <![endif]-->
+              <table class="col425" align="left" border="0" cellpadding="0" cellspacing="0"
+                style="width: 100%; max-width: 425px;">
+                <tr>
+                  <td height="70">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td class="subhead" style="padding: 0 0 0 3px;">
+                          DSC-IEM
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="size-xxl ink-black base-bold" style="padding: 20px 0 0 0;">
+                          {{heading}}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+                </td>
+              </tr>
+          </table>
+          <![endif]-->
+            </td>
+          </tr>
+          <tr>
+            <td>
+              {% block content %}Email content{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td class="footer" bgcolor="#44525f">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" class="footercopy">
+                    &reg; DSC-IEM, Kolkata 2020<br />
+                    <br />
+                    <a href="{{BASE_URL}}/userSettings" class="unsubscribe">
+                      <font color="#cfcfcf">Unsubscribe</font>
+                    </a>
+                    <span class="hide ink-grey">from our emails</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding: 20px 0 0 0;">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="37" style="text-align: center; padding: 0 10px 0 10px;">
+                          <a href="http://www.facebook.com/dsciem">
+                            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/facebook.png" width="37"
+                              height="37" alt="Facebook" border="0" />
+                          </a>
+                        </td>
+                        <td width="37" style="text-align: center; padding: 0 10px 0 10px;">
+                          <a href="http://www.twitter.com/dsc_iem">
+                            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/twitter.png" width="37"
+                              height="37" alt="Twitter" border="0" />
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+          </td>
+        </tr>
+    </table>
+    <![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+{% endinlinecss %}

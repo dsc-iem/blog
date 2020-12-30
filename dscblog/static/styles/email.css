@@ -1,0 +1,193 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 100% !important;
+  font-size: 16px;
+  font-family: sans-serif;
+}
+
+img {
+  height: auto;
+}
+
+hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid  #dbdbdb;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+button {
+  font-family: "Segoe UI", sans-serif;
+  font-size: inherit;
+  font-weight: inherit;
+  border-radius: 0rem;
+  padding: 0.1rem;
+  margin: 0px;
+  display: block;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.size-xs {
+  font-size: 14px;
+}
+
+.size-s {
+  font-size: 16px;
+}
+
+.size-m {
+  font-size: 20px;
+}
+
+.size-l {
+  font-size: 22px;
+}
+
+.size-xl {
+  font-size: 26px;
+}
+
+.size-xxl {
+  font-size: 30px;
+}
+
+.content {
+  width: 100%;
+  max-width: 600px;
+}
+
+.header {
+  padding: 40px 30px 20px 30px;
+}
+
+.innerpadding {
+  padding: 30px 30px 30px 30px;
+}
+
+.borderbottom {
+  border-bottom: 1px solid #f2eeed;
+}
+
+.subhead {
+  font-size: 20px;
+  font-weight: 500;
+  color: #017a73;
+  font-family: sans-serif;
+}
+
+.ink-black {
+  color: #181818;
+}
+
+.ink-dark {
+  color: #3b3b3b;
+}
+
+.ink-light {
+  color: #dbdbdb;
+}
+
+.ink-white {
+  color: #ffffff;
+}
+
+.ink-blue {
+  color: #00a8ff;
+}
+
+.ink-red {
+  color: #ff004e;
+}
+
+.ink-green {
+  color: #00a71c;
+}
+
+.ink-grey {
+  color: #808080;
+}
+
+.base-light {
+  font-weight: 200;
+}
+
+.base-semilight {
+  font-weight: 400;
+}
+
+.base-regular {
+  font-weight: 600;
+}
+
+.base-semibold {
+  font-weight: 700;
+}
+
+.base-bold {
+  font-weight: 800;
+}
+
+.h1,
+.h2,
+.bodycopy {
+  color: #131313;
+  font-family: sans-serif;
+}
+
+.h1 {
+  font-size: 33px;
+  line-height: 38px;
+  font-weight: bold;
+}
+
+.h2 {
+  padding: 0 0 15px 0;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: bold;
+}
+
+.bodycopy {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.button {
+  text-align: center;
+  font-size: 18px;
+  font-family: sans-serif;
+  font-weight: bold;
+  padding: 0 30px 0 30px;
+}
+
+.button a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.footer {
+  padding: 20px 30px 15px 30px;
+}
+
+.footercopy {
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.footercopy a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.dp{
+    border-radius: 100%;
+}

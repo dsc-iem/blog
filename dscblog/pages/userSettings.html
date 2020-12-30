@@ -9,11 +9,20 @@
         User settings
     </div>
     <hr />
-        <form method="post">
-            {{ form.as_p }}
-            <button type="submit">Save</button>
-        </form>
-    <br/>
+    <form method="post">
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <br />
 </div>
-
+<script>
+    $(document).ready(function () {
+        $("input[type=checkbox]").parent().css({
+            flexDirection: 'row',
+            width: '17rem',
+            maxWidth: '85vw',
+            justifyContent:'space-between'
+        })
+    })
+</script>
 {% endblock %}

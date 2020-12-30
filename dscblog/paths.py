@@ -13,6 +13,7 @@ import bleach
 from bleach_allowlist import markdown_tags, markdown_attrs, all_styles
 from urllib.parse import urlparse
 from dscblog.settings import BASE_URL
+from dscblog.email import get_html as email_html
 
 
 markdown_attrs['*'] += ['class']
@@ -233,6 +234,16 @@ def profile(request, username):
             request.user if request.user.is_authenticated else None)
         res = render(request, 'profile.html', opts)
         return res
+
+@login_required
+def email_alert_preview(request):
+    user=request.user
+    msg = Alert.get_new_alerts(user=user)
+    heading='You have '+str(len(msg))+' new notification'
+    if len(msg)>1:
+        heading+='s'
+    html = email_html({'alerts':msg,'heading':heading},'alerts',user)
+    return HttpResponse(html)
 
 
 def blog(request, slug, id):
