@@ -6,7 +6,7 @@ from django.contrib.auth.base_user import BaseUserManager
 import datetime
 from django.utils import timezone
 from dscblog.common import makecode, dump_datetime
-from dscblog.settings import DATABASES
+from dscblog.settings import DATABASES, BASE_URL
 from django.utils.text import slugify
 import html
 import datetime
@@ -60,6 +60,10 @@ class User(AbstractUser):
                            default='', verbose_name='Bio')
     first_name = None
     last_name = None
+    last_visit = models.DateTimeField(null=True, default=None)
+    receive_email_alerts = models.BooleanField(default=True)
+    receive_newsletters = models.BooleanField(default=True)
+    last_alert_email_date = models.DateTimeField(null=True, default=None)
     REQUIRED_FIELDS = []
 
     objects = UserManager()
@@ -455,7 +459,7 @@ class Blog(models.Model):
         return slugify(self.title)
 
     def get_url(self):
-        return '/'+self.get_slug()+','+str(self.id)
+        return BASE_URL+'/'+self.get_slug()+','+str(self.id)
 
     def remove(self):
         self.delete()
@@ -888,21 +892,27 @@ class Alert(models.Model):
         (FOLLOW, 'follow'),
         (COMMENT, 'comment'),
         (COMMENT_REPLY, 'comment reply'),
-        (REACTION, 'reaction'),
-        (NEW_BLOG, 'new blog')
+        (NEW_BLOG, 'new blog'),
+        (REACTION, 'reaction')
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_user')
-    ref_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_ref_user')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='alerts')
+    ref_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='alert_refs')
     seen = models.BooleanField(default=False)
     type = models.CharField(
         max_length=2,
         choices=TYPES,
         default=None,
     )
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    follow = models.ForeignKey(Follower, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    blog = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    follow = models.ForeignKey(
+        Follower, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    reaction = models.ForeignKey(
+        Reaction, on_delete=models.CASCADE, default=None, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     @classmethod
@@ -913,7 +923,7 @@ class Alert(models.Model):
         if user.id != ref_user.id and (blog and blog.is_subscribed):
             cls.check_for_max_limit(user)
             obj = cls.objects.update_or_create(user=user, ref_user=ref_user, type=type, blog=blog, comment=comment, reaction=reaction,
-                      follow=follow)
+                                               follow=follow)
             # obj.save()
 
     # This function is used to generate and delete the new blog alert for followed user
@@ -923,10 +933,12 @@ class Alert(models.Model):
         for follower in ref_user.get_followers():
             if not delete:
                 cls.check_for_max_limit(follower.user)
-                obj = cls(user=follower.user, ref_user=ref_user, type=cls.NEW_BLOG, blog=blog)
+                obj = cls(user=follower.user, ref_user=ref_user,
+                          type=cls.NEW_BLOG, blog=blog)
                 obj.save()
             else:
-                obj = cls.objects.filter(user=follower.user, ref_user=ref_user, type=cls.NEW_BLOG, blog=blog)
+                obj = cls.objects.filter(
+                    user=follower.user, ref_user=ref_user, type=cls.NEW_BLOG, blog=blog)
                 if obj.count() > 0:
                     obj.delete()
 
@@ -964,27 +976,29 @@ class Alert(models.Model):
         info = {}
         for alert in alerts:
             if alert.type == cls.FOLLOW:
-                grouped_alerts.append({'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> started '
-                                                f'following you', 'timestamp': alert.timestamp, 'id': alert.pk})
+                grouped_alerts.append({'type': alert.type, 'avatar_url': alert.ref_user.avatar_url, 'alert': f'<a href="{BASE_URL}/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> started '
+                                       f'following you', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif alert.type == cls.NEW_BLOG:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> posted a new blog <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'type': alert.type, 'img_url': alert.blog.img_url, 'alert': f'<a href="{BASE_URL}/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> posted a new blog <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>.', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.COMMENT:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> commented on <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>: "{alert.comment.text}"', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'type': alert.type, 'img_url': alert.blog.img_url, 'alert': f'<a href="{BASE_URL}/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> commented on <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>: "{alert.comment.text}"', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.COMMENT_REPLY:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> replied to your comment: "{alert.comment.reference.text}" on <a href="{alert.blog.get_url()}"> "{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'type': alert.type, 'avatar_url': alert.ref_user.avatar_url, 'alert': f'<a href="{BASE_URL}/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> replied to your comment: "{alert.comment.reference.text}" on <a href="{alert.blog.get_url()}"> "{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
             elif not group_blog_alert and alert.type == cls.REACTION:
                 grouped_alerts.append(
-                    {'alert': f'<a href="/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> reacted {cls.map_reaction_type_to_emoji(alert.reaction.reaction)} to <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
+                    {'type': alert.type, 'img_url': alert.blog.img_url, 'alert': f'<a href="{BASE_URL}/@{alert.ref_user.username}">{alert.ref_user.get_name()}</a> reacted {cls.map_reaction_type_to_emoji(alert.reaction.reaction)} to <a href="{alert.blog.get_url()}">"{alert.blog.title}"</a>', 'timestamp': alert.timestamp, 'id': alert.pk})
             else:
                 key = alert.blog.pk
                 if key not in blogs:
-                    blogs[key] = {cls.REACTION: 0, cls.COMMENT: 0, cls.COMMENT_REPLY: 0}
+                    blogs[key] = {cls.REACTION: 0,
+                                  cls.COMMENT: 0, cls.COMMENT_REPLY: 0}
                 blogs[key][alert.type] += 1
                 if key not in info:
-                    info[key] = {'name': alert.blog.title, 'timestamp': alert.timestamp, 'id': [alert.pk], 'url': alert.blog.get_url()}
+                    info[key] = {'name': alert.blog.title, 'timestamp': alert.timestamp, 'id': [
+                        alert.pk], 'url': alert.blog.get_url(), 'img_url': alert.blog.img_url}
                 else:
                     info[key]['id'].append(alert.pk)
 
@@ -1003,7 +1017,8 @@ class Alert(models.Model):
             msg = msg[:-2]
             if is_added:
                 msg += f' on <a href={info[key]["url"]}>"{info[key]["name"]}"</a>'
-            grouped_alerts.append({'alert': msg, 'timestamp': info[key]['timestamp'], 'id': info[key]['id']})
+            grouped_alerts.append(
+                {'alert': msg, 'img_url': info[key]['img_url'], 'timestamp': info[key]['timestamp'], 'id': info[key]['id'], 'type': 'GRP'})
 
         return sorted(grouped_alerts, key=lambda x: x['timestamp'], reverse=True)
 

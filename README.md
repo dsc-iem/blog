@@ -34,7 +34,7 @@ blogenv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-#### After making changes to static files
+#### After making changes to static files 🎴
 
 ```bash
 python manage.py collectstatic
@@ -73,6 +73,13 @@ For local setup, you can also use `settings_dev.py` file
 - `DJ_SECRET_KEY`: Django secret key
 - `BASE_URL`: Root url of the server. eg: `https://example.com`
 - `DATABASE_URL`: eg: `postgres://user:password@localhost/dbname`
+- `HOST`: eg: `example.com`
+
+optionals
+
+- `EMAIL_HOST`: eg: `smtp.gmail.com`
+- `EMAIL_HOST_USER`: eg: `test@gmail.com`
+- `EMAIL_HOST_PASSWORD`: Your email password
 
 ## Be a super user 😎
 

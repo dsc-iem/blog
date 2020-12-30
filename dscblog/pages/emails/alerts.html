@@ -1,0 +1,30 @@
+{% extends "emails/base.html" %}
+{% block title %}
+New Notifications | DSC-IEM Blog
+{% endblock %}
+{% load inlinecss %}
+{% block content %}
+{% inlinecss "styles/email.css" %}
+{% for alert in alerts %}
+<table class="borderbottom" border="0" cellspacing="0" cellpadding="0">
+    <tr width="100%">
+        {% if alert.img_url %}
+        <td align="center" width="85" height="60">
+            <img class="fix" src="{{alert.img_url}}" width="85" height="60" border="0" alt="" />
+        </td>
+        {% endif %}
+        <td align="left" class="ink-grey size-s base-semilight" width="500" style="padding-left: 12px;">
+            {% autoescape off %}
+            {{ alert.alert }}
+            {% endautoescape %}
+        </td>
+        {% if alert.avatar_url %}
+        <td align="right" width="40" height="40">
+            <img class="fix dp" src="{{alert.avatar_url}}" width="40" height="40" border="0" alt="" />
+        </td>
+        {% endif %}
+    </tr>
+</table>
+{% endfor %}
+{% endinlinecss %}
+{% endblock %}

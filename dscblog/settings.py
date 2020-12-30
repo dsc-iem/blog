@@ -31,7 +31,7 @@ if will_debug != 'no':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.environ.get('HOST', '*')]
 
 
 # Application definition
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_inlinecss'
 ]
 
 MIDDLEWARE = [
@@ -56,10 +57,11 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dscblog.middlewares.LastVisit'
 ]
 
 ROOT_URLCONF = 'dscblog.urls'
@@ -179,7 +181,7 @@ AUTH_USER_MODEL = 'dscblog.User'
 
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
 
-DOMAIN_NAME = os.environ.get('DOMAIN_NAME', 'localhost:8000')
+DOMAIN_NAME = os.environ.get('HOST', 'localhost:8000')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -193,6 +195,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'dscblog', 'static')
 ]
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+EMAIL_PORT = 587
 
 try:
     from dscblog.settings_dev import *

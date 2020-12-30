@@ -67,6 +67,7 @@ urlpatterns = [
     path('api/alerts/seen', paths.set_alerts_seen),
     path('info/privacy', paths.page_loader, {'page': 'info/privacy'}),
     path('info/terms', paths.page_loader, {'page': 'info/terms'}),
+    path('preview/email/alerts', paths.email_alert_preview),
 ]
 
 handler404 = 'dscblog.paths.page404'
