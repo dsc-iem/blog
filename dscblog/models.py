@@ -385,6 +385,7 @@ class Blog(models.Model):
     modified_on = models.DateTimeField()
     published_on = models.DateTimeField(null=True, default=None)
     is_published = models.BooleanField(default=False)
+    is_subscribed = models.BooleanField(default=True)
     score = models.FloatField(verbose_name='Engagement Score', default=0.0)
     topics = models.ManyToManyField('Topic', related_name="blogs")
 
@@ -486,6 +487,20 @@ class Blog(models.Model):
             self.is_published = False
             self.published_on = None
             self.modified_on = timezone.now()
+            self.save()
+
+    def subscribe(self):
+        if not self.is_subscribed:
+            self.is_subscribed = True
+            self.modified_on = timezone.now()
+            self.save()
+
+    def unsubscribe(self):
+        if self.is_subscribed:
+            self.is_subscribed = False
+            self.modified_on = timezone.now()
+            # Deleting Alerts
+            Alert.objects.filter(blog_id=self.id).delete()
             self.save()
 
     def has_topic(self, name):
@@ -895,7 +910,7 @@ class Alert(models.Model):
         if type == cls.COMMENT or type == cls.REACTION:
             user = Blog.objects.get(pk=blog.pk).author
 
-        if user.id != ref_user.id:
+        if user.id != ref_user.id and (blog and blog.is_subscribed):
             cls.check_for_max_limit(user)
             obj = cls.objects.update_or_create(user=user, ref_user=ref_user, type=type, blog=blog, comment=comment, reaction=reaction,
                       follow=follow)

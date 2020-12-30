@@ -324,8 +324,10 @@ def blog_settings(request, id):
         return page404(request)
     else:
         if request.user == b.author:
+            blog_opts = b.get_obj_min()
+            blog_opts['is_subscribed'] = b.is_subscribed
             opts = {'header': {'is_loggedin': True, 'is_empty': False, 'float': True},
-                    'blog': b.get_obj_min()}
+                    'blog': blog_opts}
             topics = []
             for topic in b.get_topics():
                 topics.append(topic.name)
@@ -616,6 +618,46 @@ def unpublish_blog(request):
                     b.unpublish()
                     Alert.alerts_for_new_blog(blog=b, delete=True)
                     return apiRespond(201, is_published=b.is_published)
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def subscribe_blog(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    b.subscribe()
+                    return apiRespond(201, is_subscribe=b.is_subscribed)
+                else:
+                    return apiRespond(400, msg='Access denied')
+        else:
+            return apiRespond(400, msg='Required fields missing')
+    else:
+        return apiRespond(401, msg='User not logged in')
+
+
+@require_http_methods(["POST"])
+def unsubscribe_blog(request):
+    if request.user.is_authenticated:
+        if 'blog_id' in request.POST:
+            try:
+                b = Blog.get_by_id(request.POST['blog_id'])
+            except:
+                return apiRespond(400, msg='Blog not found')
+            else:
+                if b.author == request.user:
+                    b.unsubscribe()
+                    return apiRespond(201, is_subscribe=b.is_subscribed)
                 else:
                     return apiRespond(400, msg='Access denied')
         else:
