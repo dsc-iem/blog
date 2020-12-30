@@ -196,7 +196,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'dscblog', 'static')
 ]
 
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', True)
+EMAIL_USE_TLS = True
+
+use_tls = os.environ.get('EMAIL_USE_TLS', 'yes')
+if use_tls == 'no':
+    EMAIL_USE_TLS = False
+
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
