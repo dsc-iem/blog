@@ -19,7 +19,7 @@ def send(to, subject, message, html=None):
             fail_silently=False,
         )
     except Exception as e:
-        # print(e)
+        print(e)
         return False
     else:
         return True
