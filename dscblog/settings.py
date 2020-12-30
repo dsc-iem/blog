@@ -197,10 +197,14 @@ STATICFILES_DIRS = [
 ]
 
 EMAIL_USE_TLS = True
-
 use_tls = os.environ.get('EMAIL_USE_TLS', 'yes')
 if use_tls == 'no':
     EMAIL_USE_TLS = False
+    
+EMAIL_USE_SSL = False
+use_ssl = os.environ.get('EMAIL_USE_SSL', 'no')
+if use_ssl == 'yes':
+    EMAIL_USE_SSL = True
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
