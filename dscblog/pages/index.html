@@ -22,6 +22,7 @@
 <br />
 <br />
 {% endif %}
+{% include "info/login-banner.html" %}
 <div class="container" id="s1">
     {% include "blocks/blogsGrid.html" with items=blogs.feed  %}
 </div>
@@ -32,5 +33,8 @@
     {% include "blocks/blogsGrid.html" with items=catagory.blogs  %}
 </div>
 <div style="height: 0.6rem;"></div>
+
 {% endfor %}
+<br>
+{% include "info/footer.html" %} 
 {% endblock %}

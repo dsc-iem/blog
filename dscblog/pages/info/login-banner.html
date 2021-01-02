@@ -1,0 +1,17 @@
+{% if not request.user.is_authenticated %}
+<div style="position:bottom ;
+            width:100%; 
+            height:350px;
+            left: 60px;
+            top:60px;
+            margin-top:20px; 
+            background: radial-gradient(91.06% 87.79% at 7.31% 5.58%, #96FF8B 0%, #A5FFC2 24.18%, #92FFF2 45.35%, #FFCAEF 74.34%, #FFE654 100%);
+            border-radius: 5px;">
+<h1 style=" padding-top: 15px;
+            padding-left: 30px; 
+            padding-right: 0px;">
+Unleash your creativity <br/> with DSC IEM</h1> <h7>
+   <div style="padding-top: 15px;padding-left: 30px;padding-right: 0px;">Read and share ideas from independent voices, world-class <br/> publications, and experts from around the globe. Everyone's <br/> welcome. </h7> <br/> </div> <div style="padding-top: 15px;padding-left: 30px;padding-right: 0px;">  
+    <a class="hd_opt btn btn-bordered" href="/accounts/login" style="width: 100px ;">Log In</a>
+    </div> 
+{% endif %}
